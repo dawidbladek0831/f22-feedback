@@ -1,0 +1,66 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'pl.app.feedback'
+version = '0.0.1'
+
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	SPRING_DOTENV_VERSION = '3.0.0'
+	set('springCloudVersion', "2025.0.0")
+}
+
+dependencies {
+	// COMMON
+	implementation project(':common:exception')
+
+	// WEB
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// BROKER
+	implementation 'org.springframework.cloud:spring-cloud-stream'
+
+	// LOMBOK
+	compileOnly "org.projectlombok:lombok"
+	annotationProcessor "org.projectlombok:lombok"
+
+	// ENV
+	implementation "me.paulschwarz:spring-dotenv:${SPRING_DOTENV_VERSION}"
+
+	// TEST
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.projectreactor:reactor-test'
+	testImplementation 'org.springframework.cloud:spring-cloud-stream-test-binder'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+
+tasks.jar {
+	archiveFileName.set("normal.jar")
+}
+tasks.bootJar {
+	archiveFileName.set("executable.jar")
+}
