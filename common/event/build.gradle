@@ -1,0 +1,15 @@
+plugins {
+    id 'java-library'
+}
+
+group = "pl.app.common.event"
+version = "0.1.0"
+
+dependencies {
+    // https://mvnrepository.com/artifact/io.projectreactor/reactor-core
+    implementation 'io.projectreactor:reactor-core:3.7.7'
+}
+
+jar {
+    enabled = true
+}
