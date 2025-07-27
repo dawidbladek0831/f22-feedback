@@ -13,7 +13,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import pl.app.common.event.EventPublisher;
-import pl.app.feedback.reaction.application.domain.ReactionEvent;
+import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
 import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,12 +41,12 @@ class ReactionServiceTest {
         registry.add("app.reaction.policy.allowed-domain-object-types-policy.enable", () -> "true");
         registry.add("app.reaction.policy.allowed-domain-object-types-policy.types", () -> "POST,VIDEO");
 
-        registry.add("app.reaction.policy.allowed-user-reactions-policy.enable", () -> "true");
-        registry.add("app.reaction.policy.allowed-user-reactions-policy.default-reactions", () -> "LIKE,DISLIKE");
-        registry.add("app.reaction.policy.allowed-user-reactions-policy.types.VIDEO.reactions", () -> "BORING,GREAT,AMAZING");
+        registry.add("app.reaction.policy.allowed-reactions-policy.enable", () -> "true");
+        registry.add("app.reaction.policy.allowed-reactions-policy.default-reactions", () -> "LIKE,DISLIKE");
+        registry.add("app.reaction.policy.allowed-reactions-policy.types.VIDEO.reactions", () -> "BORING,GREAT,AMAZING");
 
-        registry.add("app.reaction.policy.single-user-reaction-policy.enable", () -> "true");
-        registry.add("app.reaction.policy.single-user-reaction-policy.types.VIDEO.enable", () -> "false");
+        registry.add("app.reaction.policy.single-reaction-policy.enable", () -> "true");
+        registry.add("app.reaction.policy.single-reaction-policy.types.VIDEO.enable", () -> "false");
     }
 
     @Test
@@ -57,13 +57,13 @@ class ReactionServiceTest {
         var reaction = "LIke";
 
         StepVerifier.create(
-                reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction))
+                reactionService.add(new ReactionCommand.AddReactionCommand(domainObjectType, domainObjectId, userId, reaction))
         ).assertNext(domain -> {
             assertThat(domain).isNotNull();
             assertThat(domain.getDomainObjectType()).isEqualTo(domainObjectType.toUpperCase());
         }).verifyComplete();
-        verify(eventPublisher, times(1)).publish(any(ReactionEvent.UserReactionCreatedEvent.class));
-        verify(eventPublisher, times(1)).publish(any(ReactionEvent.UserReactionAddedEvent.class));
+        verify(eventPublisher, times(1)).publish(any(ReactionEvent.ReactionCreatedEvent.class));
+        verify(eventPublisher, times(1)).publish(any(ReactionEvent.ReactionAddedEvent.class));
     }
     @Test
     void whenUserSendSecondReaction_thenReactionShouldBeOnlyUpdated() {
@@ -71,17 +71,17 @@ class ReactionServiceTest {
         var domainObjectId = ObjectId.get().toString();
         var userId = ObjectId.get().toString();
         var reaction = "LIke";
-        reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction)).block();
+        reactionService.add(new ReactionCommand.AddReactionCommand(domainObjectType, domainObjectId, userId, reaction)).block();
 
         Mockito.reset(eventPublisher);
 
         StepVerifier.create(
-                reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction))
+                reactionService.add(new ReactionCommand.AddReactionCommand(domainObjectType, domainObjectId, userId, reaction))
         ).assertNext(domain -> {
             assertThat(domain).isNotNull();
         }).verifyComplete();
-        verify(eventPublisher, times(0)).publish(any(ReactionEvent.UserReactionCreatedEvent.class));
-        verify(eventPublisher, times(1)).publish(any(ReactionEvent.UserReactionAddedEvent.class));
+        verify(eventPublisher, times(0)).publish(any(ReactionEvent.ReactionCreatedEvent.class));
+        verify(eventPublisher, times(1)).publish(any(ReactionEvent.ReactionAddedEvent.class));
     }
 
     @Test
@@ -92,7 +92,7 @@ class ReactionServiceTest {
         var reaction = "LIKE";
 
         StepVerifier.create(
-                reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction))
+                reactionService.add(new ReactionCommand.AddReactionCommand(domainObjectType, domainObjectId, userId, reaction))
         ).verifyError();
     }
 
@@ -104,7 +104,7 @@ class ReactionServiceTest {
         var reaction = "AMAZING";
 
         StepVerifier.create(
-                reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction))
+                reactionService.add(new ReactionCommand.AddReactionCommand(domainObjectType, domainObjectId, userId, reaction))
         ).assertNext(domain -> {
             assertThat(domain).isNotNull();
         }).verifyComplete();
@@ -118,7 +118,7 @@ class ReactionServiceTest {
         var reaction = "BORING";
 
         StepVerifier.create(
-                reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction))
+                reactionService.add(new ReactionCommand.AddReactionCommand(domainObjectType, domainObjectId, userId, reaction))
         ).verifyError();
     }
 
@@ -128,19 +128,19 @@ class ReactionServiceTest {
         var domainObjectId = ObjectId.get().toString();
         var userId = ObjectId.get().toString();
         var reaction = "LIKE";
-        reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction)).block();
+        reactionService.add(new ReactionCommand.AddReactionCommand(domainObjectType, domainObjectId, userId, reaction)).block();
 
         Mockito.reset(eventPublisher);
 
         StepVerifier.create(
-                reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, "DISLIKE"))
+                reactionService.add(new ReactionCommand.AddReactionCommand(domainObjectType, domainObjectId, userId, "DISLIKE"))
         ).assertNext(domain -> {
             assertThat(domain).isNotNull();
             assertThat(domain.getReactions()).hasSize(1);
         }).verifyComplete();
 
-        verify(eventPublisher, times(1)).publish(any(ReactionEvent.UserReactionAddedEvent.class));
-        verify(eventPublisher, times(1)).publish(any(ReactionEvent.UserReactionRemovedEvent.class));
+        verify(eventPublisher, times(1)).publish(any(ReactionEvent.ReactionAddedEvent.class));
+        verify(eventPublisher, times(1)).publish(any(ReactionEvent.ReactionRemovedEvent.class));
     }
 
     @Test
@@ -149,15 +149,15 @@ class ReactionServiceTest {
         var domainObjectId = ObjectId.get().toString();
         var userId = ObjectId.get().toString();
         var reaction = "LIKE";
-        reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction)).block();
+        reactionService.add(new ReactionCommand.AddReactionCommand(domainObjectType, domainObjectId, userId, reaction)).block();
         Mockito.reset(eventPublisher);
 
         StepVerifier.create(
-                reactionService.remove(new ReactionCommand.RemoveUserReactionCommand(domainObjectType, domainObjectId, userId, reaction))
+                reactionService.remove(new ReactionCommand.RemoveReactionCommand(domainObjectType, domainObjectId, userId, reaction))
         ).assertNext(domain -> {
             assertThat(domain).isNotNull();
         }).verifyComplete();
 
-        verify(eventPublisher, times(1)).publish(any(ReactionEvent.UserReactionRemovedEvent.class));
+        verify(eventPublisher, times(1)).publish(any(ReactionEvent.ReactionRemovedEvent.class));
     }
 }

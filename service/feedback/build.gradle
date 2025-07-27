@@ -20,6 +20,7 @@ repositories {
 
 ext {
 	SPRING_DOTENV_VERSION = '3.0.0'
+	MODDELMAPPER_VERSION = '3.1.1'
 	set('springCloudVersion', "2025.0.0")
 }
 
@@ -38,10 +39,15 @@ dependencies {
 
 	// BROKER
 	implementation 'org.springframework.cloud:spring-cloud-stream'
+	implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
 
 	// LOMBOK
 	compileOnly "org.projectlombok:lombok"
 	annotationProcessor "org.projectlombok:lombok"
+
+	// MAPPER
+	implementation "org.modelmapper:modelmapper:${MODDELMAPPER_VERSION}"
+	implementation "org.modelmapper.extensions:modelmapper-spring:${MODDELMAPPER_VERSION}"
 
 	// ENV
 	implementation "me.paulschwarz:spring-dotenv:${SPRING_DOTENV_VERSION}"

@@ -2,7 +2,7 @@ package pl.app.feedback.reaction.application.port.in;
 
 public interface ReactionCommand {
 
-    record AddUserReactionCommand(
+    record AddReactionCommand(
             String domainObjectType,
             String domainObjectId,
             String userId,
@@ -10,7 +10,7 @@ public interface ReactionCommand {
     ) {
     }
 
-    record RemoveUserReactionCommand(
+    record RemoveReactionCommand(
             String domainObjectType,
             String domainObjectId,
             String userId,

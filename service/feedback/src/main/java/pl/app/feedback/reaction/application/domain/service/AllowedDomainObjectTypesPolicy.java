@@ -1,11 +1,11 @@
-package pl.app.feedback.reaction.application.port.in;
+package pl.app.feedback.reaction.application.domain.service;
 
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-import pl.app.feedback.reaction.application.domain.ReactionException;
+import pl.app.feedback.reaction.application.domain.model.ReactionException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;

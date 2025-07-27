@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 import java.util.Collection;
 
 @Component
-public class LoggerEventPublisher implements EventPublisher {
+class LoggerEventPublisher implements EventPublisher {
     private static final Logger logger = LoggerFactory.getLogger(LoggerEventPublisher.class);
 
     @Override

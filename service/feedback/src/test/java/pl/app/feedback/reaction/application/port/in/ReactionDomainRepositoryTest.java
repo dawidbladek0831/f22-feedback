@@ -5,15 +5,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import pl.app.feedback.reaction.application.domain.UserReaction;
+import pl.app.feedback.reaction.application.domain.model.Reaction;
+import pl.app.feedback.reaction.application.port.out.ReactionDomainRepository;
 import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class UserReactionDomainRepositoryTest {
+class ReactionDomainRepositoryTest {
     @Autowired
-    UserReactionDomainRepository repository;
+    ReactionDomainRepository repository;
 
     @Autowired
     ReactiveMongoTemplate mongoTemplate;
@@ -24,7 +25,7 @@ class UserReactionDomainRepositoryTest {
         var domainObjectId = ObjectId.get().toString();
         var userId = ObjectId.get().toString();
 
-        var domain = new UserReaction(domainObjectType, domainObjectId, userId);
+        var domain = new Reaction(domainObjectType, domainObjectId, userId);
         mongoTemplate.save(domain).block();
 
         StepVerifier.create(

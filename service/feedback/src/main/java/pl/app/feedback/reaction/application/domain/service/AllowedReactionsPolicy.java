@@ -1,11 +1,11 @@
-package pl.app.feedback.reaction.application.port.in;
+package pl.app.feedback.reaction.application.domain.service;
 
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-import pl.app.feedback.reaction.application.domain.ReactionException;
+import pl.app.feedback.reaction.application.domain.model.ReactionException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -13,11 +13,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-class AllowedUserReactionsPolicy {
-    private static final Logger logger = LoggerFactory.getLogger(AllowedUserReactionsPolicy.class);
-    private final AllowedUserReactionsPolicyProperties properties;
+class AllowedReactionsPolicy {
+    private static final Logger logger = LoggerFactory.getLogger(AllowedReactionsPolicy.class);
+    private final AllowedReactionsPolicyProperties properties;
 
-    public AllowedUserReactionsPolicy(AllowedUserReactionsPolicyProperties properties) {
+    public AllowedReactionsPolicy(AllowedReactionsPolicyProperties properties) {
         this.properties = properties;
         if (!isPolicyEnable()) {
             logger.info("policy is DISABLE");
@@ -59,8 +59,8 @@ class AllowedUserReactionsPolicy {
 
     @Data
     @Component
-    @ConfigurationProperties(prefix = "app.reaction.policy.allowed-user-reactions-policy")
-    static class AllowedUserReactionsPolicyProperties {
+    @ConfigurationProperties(prefix = "app.reaction.policy.allowed-reactions-policy")
+    static class AllowedReactionsPolicyProperties {
         private Boolean enable = false;
         private List<String> defaultReactions = List.of();
         private Map<String, Type> types = Map.of();

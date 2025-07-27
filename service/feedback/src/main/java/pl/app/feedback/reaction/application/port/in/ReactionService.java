@@ -1,10 +1,10 @@
 package pl.app.feedback.reaction.application.port.in;
 
-import pl.app.feedback.reaction.application.domain.UserReaction;
+import pl.app.feedback.reaction.application.domain.model.Reaction;
 import reactor.core.publisher.Mono;
 
 public interface ReactionService {
-    Mono<UserReaction> add(ReactionCommand.AddUserReactionCommand command);
+    Mono<Reaction> add(ReactionCommand.AddReactionCommand command);
 
-    Mono<UserReaction> remove(ReactionCommand.RemoveUserReactionCommand command);
+    Mono<Reaction> remove(ReactionCommand.RemoveReactionCommand command);
 }

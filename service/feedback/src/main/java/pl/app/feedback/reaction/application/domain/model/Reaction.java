@@ -1,4 +1,4 @@
-package pl.app.feedback.reaction.application.domain;
+package pl.app.feedback.reaction.application.domain.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -6,15 +6,13 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Document(collection = "user_reaction")
 @Getter
 @NoArgsConstructor
-public class UserReaction {
+public class Reaction {
     @Id
     private ObjectId id;
     private String domainObjectType;
@@ -24,7 +22,7 @@ public class UserReaction {
 
     private Set<String> reactions;
 
-    public UserReaction(String domainObjectType, String domainObjectId, String userId) {
+    public Reaction(String domainObjectType, String domainObjectId, String userId) {
         this.id = ObjectId.get();
         this.domainObjectType = domainObjectType;
         this.domainObjectId = domainObjectId;
@@ -41,7 +39,7 @@ public class UserReaction {
 
     public void removeReaction(String reaction) {
         if(!containReaction(reaction)){
-            throw ReactionException.NotFoundUserReactionException.reaction(reaction);
+            throw ReactionException.NotFoundReactionException.reaction(reaction);
         }
         this.reactions.remove(reaction);
     }

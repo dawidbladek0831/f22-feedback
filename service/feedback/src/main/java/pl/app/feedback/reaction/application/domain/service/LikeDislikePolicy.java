@@ -1,4 +1,4 @@
-package pl.app.feedback.reaction.application.port.in;
+package pl.app.feedback.reaction.application.domain.service;
 
 import lombok.Data;
 import org.slf4j.Logger;
@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import pl.app.common.event.EventPublisher;
-import pl.app.feedback.reaction.application.domain.ReactionEvent;
-import pl.app.feedback.reaction.application.domain.UserReaction;
+import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
+import pl.app.feedback.reaction.application.domain.model.Reaction;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -28,7 +28,7 @@ class LikeDislikePolicy {
         }
     }
 
-    public Mono<UserReaction> apply(UserReaction domain, String newReaction) {
+    public Mono<Reaction> apply(Reaction domain, String newReaction) {
         if (!isPolicyEnable()) {
             return Mono.just(domain);
         }
@@ -47,7 +47,7 @@ class LikeDislikePolicy {
         return Mono.just(domain);
     }
 
-    public Mono<UserReaction> removeOppositeReaction(UserReaction domain, String reaction) {
+    public Mono<Reaction> removeOppositeReaction(Reaction domain, String reaction) {
         if (reaction.equals("LIKE") && domain.containReaction("DISLIKE")) {
             return removeReaction(domain, "DISLIKE");
         }
@@ -57,9 +57,9 @@ class LikeDislikePolicy {
         return Mono.just(domain);
     }
 
-    public Mono<UserReaction> removeReaction(UserReaction domain, String reaction) {
+    public Mono<Reaction> removeReaction(Reaction domain, String reaction) {
         domain.removeReaction(reaction);
-        var event = new ReactionEvent.UserReactionRemovedEvent(domain.getId(), domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getUserId(), reaction);
+        var event = new ReactionEvent.ReactionRemovedEvent(domain.getId(), domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getUserId(), reaction);
         return eventPublisher.publish(event)
                 .thenReturn(domain);
     }

@@ -1,4 +1,4 @@
-package pl.app.feedback.reaction.application.domain;
+package pl.app.feedback.reaction.application.domain.model;
 
 import pl.app.common.exception.*;
 
@@ -21,17 +21,17 @@ public interface ReactionException {
         }
     }
 
-    class NotFoundUserReactionException extends NotFoundException {
-        public NotFoundUserReactionException() {
+    class NotFoundReactionException extends NotFoundException {
+        public NotFoundReactionException() {
             super("not found user reaction");
         }
 
-        public NotFoundUserReactionException(String message) {
+        public NotFoundReactionException(String message) {
             super(message);
         }
 
-        public static NotFoundUserReactionException reaction(String reaction) {
-            return new NotFoundUserReactionException(
+        public static NotFoundReactionException reaction(String reaction) {
+            return new NotFoundReactionException(
                     MessageFormat.format("not found user reaction: {0}", reaction)
             );
         }
