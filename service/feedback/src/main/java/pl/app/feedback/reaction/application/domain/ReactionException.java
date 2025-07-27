@@ -51,4 +51,19 @@ public interface ReactionException {
             );
         }
     }
+    class InvalidReactionException extends ValidationException {
+        public InvalidReactionException() {
+            super("reaction is invalid");
+        }
+
+        public InvalidReactionException(String message) {
+            super(message);
+        }
+
+        public static InvalidReactionException reaction(String reaction) {
+            return new InvalidReactionException(
+                    MessageFormat.format("reaction is invalid: {0}", reaction)
+            );
+        }
+    }
 }

@@ -12,8 +12,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.test.StepVerifier;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -31,7 +29,11 @@ class ReactionServiceTest {
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
         registry.add("app.reaction.policy.allowed-domain-object-types-policy.enable", () -> "true");
-        registry.add("app.reaction.policy.allowed-domain-object-types-policy.types", () -> "POST");
+        registry.add("app.reaction.policy.allowed-domain-object-types-policy.types", () -> "POST,VIDEO");
+
+        registry.add("app.reaction.policy.allowed-user-reactions-policy.enable", () -> "true");
+        registry.add("app.reaction.policy.allowed-user-reactions-policy.default-reactions", () -> "LIKE,DISLIKE");
+        registry.add("app.reaction.policy.allowed-user-reactions-policy.types.VIDEO.reactions", () -> "BORING,GREAT,AMAZING");
     }
 
     @Test
@@ -43,18 +45,43 @@ class ReactionServiceTest {
 
         StepVerifier.create(
                 reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction))
-        ).assertNext(domain ->{
-            System.out.println(domain);
+        ).assertNext(domain -> {
             assertThat(domain).isNotNull();
             assertThat(domain.getDomainObjectType()).isEqualTo(domainObjectType.toUpperCase());
         }).verifyComplete();
     }
+
     @Test
     void whenCommandContainsNotAllowedDomainObjectType_thenAllowedDomainObjectTypesPolicyShouldThrowException() {
         var domainObjectType = "ARTICLE";
         var domainObjectId = ObjectId.get().toString();
         var userId = ObjectId.get().toString();
         var reaction = "LIKE";
+
+        StepVerifier.create(
+                reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction))
+        ).verifyError();
+    }
+
+    @Test
+    void whenCommandContainsAllowedReactionOnType_thenAllowedUserReactionsPolicyShouldPassCommand() {
+        var domainObjectType = "VIDEO";
+        var domainObjectId = ObjectId.get().toString();
+        var userId = ObjectId.get().toString();
+        var reaction = "AMAZING";
+
+        StepVerifier.create(
+                reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction))
+        ).assertNext(domain -> {
+            assertThat(domain).isNotNull();
+        }).verifyComplete();
+    }
+    @Test
+    void whenCommandContainsNotAllowedReaction_thenAllowedUserReactionsPolicyShouldThrowException() {
+        var domainObjectType = "POST";
+        var domainObjectId = ObjectId.get().toString();
+        var userId = ObjectId.get().toString();
+        var reaction = "BORING";
 
         StepVerifier.create(
                 reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction))
