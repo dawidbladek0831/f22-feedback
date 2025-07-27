@@ -15,12 +15,15 @@ public class LoggerEventPublisher implements EventPublisher {
 
     @Override
     public Mono<Void> publish(Object event) {
+        if (event instanceof Collection<?> collection) {
+            return publishCollection(collection);
+        }
         logger.info("publishing event: {}", event);
         return Mono.empty();
     }
 
     @Override
-    public Mono<Void> publish(Collection<Object> events) {
+    public Mono<Void> publishCollection(Collection<?> events) {
         return Flux.fromIterable(events)
                 .flatMap(this::publish)
                 .then();

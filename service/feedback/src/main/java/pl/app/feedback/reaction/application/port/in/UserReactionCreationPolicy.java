@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Component;
 import pl.app.common.event.EventPublisher;
 import pl.app.feedback.reaction.application.domain.ReactionEvent;
+import pl.app.feedback.reaction.application.domain.ReactionException;
 import pl.app.feedback.reaction.application.domain.UserReaction;
 import reactor.core.publisher.Mono;
 
@@ -23,7 +24,7 @@ class UserReactionCreationPolicy {
 
     public Mono<UserReaction> apply(String domainObjectType, String domainObjectId, String userId) {
         return repository.fetchByDomainObjectAndUser(domainObjectType, domainObjectId, userId)
-                .onErrorResume(throwable -> create(domainObjectType, domainObjectId, domainObjectId));
+                .onErrorResume(ReactionException.NotFoundUserReactionException.class, throwable -> create(domainObjectType, domainObjectId, userId));
     }
 
     private Mono<UserReaction> create(String domainObjectType, String domainObjectId, String userId) {

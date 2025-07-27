@@ -63,10 +63,10 @@ class AllowedUserReactionsPolicy {
     static class AllowedUserReactionsPolicyProperties {
         private Boolean enable = false;
         private List<String> defaultReactions = List.of();
-        private Map<String, TypeReaction> types = Map.of();
+        private Map<String, Type> types = Map.of();
 
         @Data
-        public static class TypeReaction {
+        public static class Type {
             private List<String> reactions = List.of();
 
             public void normalize() {
@@ -82,7 +82,7 @@ class AllowedUserReactionsPolicy {
                     .toList();
         }
 
-        public void setTypes(Map<String, TypeReaction> types) {
+        public void setTypes(Map<String, Type> types) {
             this.types = types.entrySet().stream()
                     .collect(Collectors.toMap(
                             e -> e.getKey().toUpperCase(),
@@ -92,7 +92,5 @@ class AllowedUserReactionsPolicy {
                             }
                     ));
         }
-
-
     }
 }

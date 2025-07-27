@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Document(collection = "user_reaction")
 @Getter
@@ -43,6 +44,11 @@ public class UserReaction {
             throw ReactionException.NotFoundUserReactionException.reaction(reaction);
         }
         this.reactions.remove(reaction);
+    }
+    public Set<String> removeReactionAll() {
+        var reactionsToRemove = new HashSet<>(this.reactions);
+        this.reactions.clear();
+        return reactionsToRemove;
     }
 
     public boolean containReaction(String reaction){

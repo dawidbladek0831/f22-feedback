@@ -17,7 +17,8 @@ class UserReactionDomainRepositoryImpl implements UserReactionDomainRepository {
     @Override
     public Mono<UserReaction> fetchByDomainObjectAndUser(String domainObjectType, String domainObjectId, String userId) {
         return mongoTemplate.query(UserReaction.class)
-                .matching(Query.query(Criteria.where("domainObjectType").is(domainObjectType)
+                .matching(Query.query(Criteria
+                        .where("domainObjectType").is(domainObjectType)
                         .and("domainObjectId").is(domainObjectId)
                         .and("userId").is(userId)
                 )).one()
