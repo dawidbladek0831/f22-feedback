@@ -36,4 +36,19 @@ public interface ReactionException {
             );
         }
     }
+    class InvalidDomainObjectTypeException extends ValidationException {
+        public InvalidDomainObjectTypeException() {
+            super("domain object type is invalid");
+        }
+
+        public InvalidDomainObjectTypeException(String message) {
+            super(message);
+        }
+
+        public static InvalidDomainObjectTypeException domainObjectType(String domainObjectType) {
+            return new InvalidDomainObjectTypeException(
+                    MessageFormat.format("domain object type is invalid: {0}", domainObjectType)
+            );
+        }
+    }
 }

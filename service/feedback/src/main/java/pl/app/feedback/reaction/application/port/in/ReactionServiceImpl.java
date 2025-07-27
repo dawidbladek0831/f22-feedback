@@ -24,23 +24,27 @@ class ReactionServiceImpl implements ReactionService {
     private final AllowedDomainObjectTypesPolicy allowedDomainObjectTypesPolicy;
     private final AllowedUserReactionsPolicy allowedUserReactionsPolicy;
     private final UserReactionCreationPolicy userReactionCreationPolicy;
+    private final SingleUserReactionPolicy singleUserReactionPolicy;
+    private final LikeDislikePolicy likeDislikePolicy;
 
 
     @Override
     public Mono<UserReaction> add(ReactionCommand.AddUserReactionCommand rawCommand) {
         var command = normalizeCommand(rawCommand);
-        return Mono.fromCallable(() -> {
-            allowedDomainObjectTypesPolicy.apply(command.domainObjectType());
-            allowedUserReactionsPolicy.apply(command.domainObjectType(), command.reaction());
+        return Mono.fromCallable(() ->
+            allowedDomainObjectTypesPolicy.apply(command.domainObjectType())
+                    .then(allowedUserReactionsPolicy.apply(command.domainObjectType(), command.reaction()))
+                    .then(userReactionCreationPolicy.apply(command.domainObjectType(), command.domainObjectId(), command.userId())
+                            .flatMap(domain -> singleUserReactionPolicy.apply(domain))
+                            .flatMap(domain -> {
+                                domain.addReaction(command.reaction());
+                                return likeDislikePolicy.apply(domain)
+                                        .then(mongoTemplate.save(domain))
+                                        .then(eventPublisher.publish(new ReactionEvent.UserReactionAddedEvent(domain.getId(), domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getUserId(), command.reaction())))
+                                        .thenReturn(domain);
+                            }))
 
-            return userReactionCreationPolicy.apply(command.domainObjectType(), command.domainObjectId(), command.userId())
-                    .flatMap(domain -> {
-                        domain.addReaction(command.reaction());
-                        return mongoTemplate.save(domain)
-                                .then(eventPublisher.publish(new ReactionEvent.UserReactionAddedEvent(domain.getId(), domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getUserId(), command.reaction())))
-                                .thenReturn(domain);
-                    });
-        }).doOnSubscribe(subscription ->
+        ).doOnSubscribe(subscription ->
                 logger.debug("adding user reaction: {}-{}-{} {}", command.domainObjectType(), command.domainObjectId(), command.userId(), command.reaction())
         ).flatMap(Function.identity()).doOnSuccess(domain ->
                 logger.debug("added user reaction: {}-{}-{} {}", command.domainObjectType(), command.domainObjectId(), command.userId(), command.reaction())

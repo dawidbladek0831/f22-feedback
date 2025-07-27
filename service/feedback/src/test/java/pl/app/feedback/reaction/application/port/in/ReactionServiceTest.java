@@ -7,6 +7,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.test.StepVerifier;
 
@@ -26,12 +28,18 @@ class ReactionServiceTest {
     @Autowired
     private ReactionService reactionService;
 
+    @DynamicPropertySource
+    static void overrideProperties(DynamicPropertyRegistry registry) {
+        registry.add("app.reaction.policy.allowed-domain-object-types-policy.enable", () -> "true");
+        registry.add("app.reaction.policy.allowed-domain-object-types-policy.types", () -> "POST");
+    }
+
     @Test
     void whenUserSendFirstReaction_thenReactionIsCratedAndUpdated() {
-        var domainObjectType = "PoST";
+        var domainObjectType = "poST";
         var domainObjectId = ObjectId.get().toString();
         var userId = ObjectId.get().toString();
-        var reaction = "LIkE";
+        var reaction = "LIke";
 
         StepVerifier.create(
                 reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction))
@@ -40,5 +48,16 @@ class ReactionServiceTest {
             assertThat(domain).isNotNull();
             assertThat(domain.getDomainObjectType()).isEqualTo(domainObjectType.toUpperCase());
         }).verifyComplete();
+    }
+    @Test
+    void whenCommandContainsNotAllowedDomainObjectType_thenAllowedDomainObjectTypesPolicyShouldThrowException() {
+        var domainObjectType = "ARTICLE";
+        var domainObjectId = ObjectId.get().toString();
+        var userId = ObjectId.get().toString();
+        var reaction = "LIKE";
+
+        StepVerifier.create(
+                reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction))
+        ).verifyError();
     }
 }
