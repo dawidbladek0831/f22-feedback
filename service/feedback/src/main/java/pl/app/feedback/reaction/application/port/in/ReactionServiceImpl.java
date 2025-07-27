@@ -20,6 +20,7 @@ class ReactionServiceImpl implements ReactionService {
 
     private final ReactiveMongoTemplate mongoTemplate;
     private final EventPublisher eventPublisher;
+    private final UserReactionDomainRepository repository;
 
     private final AllowedDomainObjectTypesPolicy allowedDomainObjectTypesPolicy;
     private final AllowedUserReactionsPolicy allowedUserReactionsPolicy;
@@ -32,17 +33,17 @@ class ReactionServiceImpl implements ReactionService {
     public Mono<UserReaction> add(ReactionCommand.AddUserReactionCommand rawCommand) {
         var command = normalizeCommand(rawCommand);
         return Mono.fromCallable(() ->
-            allowedDomainObjectTypesPolicy.apply(command.domainObjectType())
-                    .then(allowedUserReactionsPolicy.apply(command.domainObjectType(), command.reaction()))
-                    .then(userReactionCreationPolicy.apply(command.domainObjectType(), command.domainObjectId(), command.userId())
-                            .flatMap(domain -> singleUserReactionPolicy.apply(domain))
-                            .flatMap(domain -> likeDislikePolicy.apply(domain, command.reaction()))
-                            .flatMap(domain -> {
-                                domain.addReaction(command.reaction());
-                                return mongoTemplate.save(domain)
-                                        .then(eventPublisher.publish(new ReactionEvent.UserReactionAddedEvent(domain.getId(), domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getUserId(), command.reaction())))
-                                        .thenReturn(domain);
-                            }))
+                allowedDomainObjectTypesPolicy.apply(command.domainObjectType())
+                        .then(allowedUserReactionsPolicy.apply(command.domainObjectType(), command.reaction()))
+                        .then(userReactionCreationPolicy.apply(command.domainObjectType(), command.domainObjectId(), command.userId())
+                                .flatMap(domain -> singleUserReactionPolicy.apply(domain))
+                                .flatMap(domain -> likeDislikePolicy.apply(domain, command.reaction()))
+                                .flatMap(domain -> {
+                                    domain.addReaction(command.reaction());
+                                    return mongoTemplate.save(domain)
+                                            .then(eventPublisher.publish(new ReactionEvent.UserReactionAddedEvent(domain.getId(), domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getUserId(), command.reaction())))
+                                            .thenReturn(domain);
+                                }))
 
         ).doOnSubscribe(subscription ->
                 logger.debug("adding user reaction: {}-{}-{} {}", command.domainObjectType(), command.domainObjectId(), command.userId(), command.reaction())
@@ -63,9 +64,32 @@ class ReactionServiceImpl implements ReactionService {
     }
 
     @Override
-    public Mono<UserReaction> remove(ReactionCommand.RemoveUserReactionCommand command) {
-        return null;
+    public Mono<UserReaction> remove(ReactionCommand.RemoveUserReactionCommand rawCommand) {
+        var command = normalizeCommand(rawCommand);
+        return Mono.fromCallable(() ->
+                repository.fetchByDomainObjectAndUser(command.domainObjectType(), command.domainObjectId(), command.userId())
+                        .flatMap(domain -> {
+                            domain.removeReaction(command.reaction());
+                            return mongoTemplate.save(domain)
+                                    .then(eventPublisher.publish(new ReactionEvent.UserReactionRemovedEvent(domain.getId(), domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getUserId(), command.reaction())))
+                                    .thenReturn(domain);
+                        })
+        ).doOnSubscribe(subscription ->
+                logger.debug("removing user reaction: {}-{}-{} {}", command.domainObjectType(), command.domainObjectId(), command.userId(), command.reaction())
+        ).flatMap(Function.identity()).doOnSuccess(domain ->
+                logger.debug("removed user reaction: {}-{}-{} {}", command.domainObjectType(), command.domainObjectId(), command.userId(), command.reaction())
+        ).doOnError(e ->
+                logger.error("exception occurred while removing user reaction: {}-{}-{} {}, exception: {}", command.domainObjectType(), command.domainObjectId(), command.userId(), command.reaction(), e.toString())
+        );
     }
 
+    private ReactionCommand.RemoveUserReactionCommand normalizeCommand(ReactionCommand.RemoveUserReactionCommand command) {
+        return new ReactionCommand.RemoveUserReactionCommand(
+                command.domainObjectType().toUpperCase(),
+                command.domainObjectId(),
+                command.userId(),
+                command.reaction().toUpperCase()
+        );
+    }
 
 }

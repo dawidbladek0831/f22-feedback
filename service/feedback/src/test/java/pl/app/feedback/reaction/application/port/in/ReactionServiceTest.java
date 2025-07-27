@@ -16,10 +16,8 @@ import pl.app.common.event.EventPublisher;
 import pl.app.feedback.reaction.application.domain.ReactionEvent;
 import reactor.test.StepVerifier;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -142,6 +140,24 @@ class ReactionServiceTest {
         }).verifyComplete();
 
         verify(eventPublisher, times(1)).publish(any(ReactionEvent.UserReactionAddedEvent.class));
+        verify(eventPublisher, times(1)).publish(any(ReactionEvent.UserReactionRemovedEvent.class));
+    }
+
+    @Test
+    void whenUserRemoveExistingReaction_thenReactionShouldBeRemoved() {
+        var domainObjectType = "POST";
+        var domainObjectId = ObjectId.get().toString();
+        var userId = ObjectId.get().toString();
+        var reaction = "LIKE";
+        reactionService.add(new ReactionCommand.AddUserReactionCommand(domainObjectType, domainObjectId, userId, reaction)).block();
+        Mockito.reset(eventPublisher);
+
+        StepVerifier.create(
+                reactionService.remove(new ReactionCommand.RemoveUserReactionCommand(domainObjectType, domainObjectId, userId, reaction))
+        ).assertNext(domain -> {
+            assertThat(domain).isNotNull();
+        }).verifyComplete();
+
         verify(eventPublisher, times(1)).publish(any(ReactionEvent.UserReactionRemovedEvent.class));
     }
 }
