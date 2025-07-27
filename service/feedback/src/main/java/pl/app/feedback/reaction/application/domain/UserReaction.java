@@ -40,7 +40,7 @@ public class UserReaction {
     }
 
     public void removeReaction(String reaction) {
-        if(containReaction(reaction)){
+        if(!containReaction(reaction)){
             throw ReactionException.NotFoundUserReactionException.reaction(reaction);
         }
         this.reactions.remove(reaction);

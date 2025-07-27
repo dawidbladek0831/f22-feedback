@@ -31,7 +31,7 @@ class SingleUserReactionPolicy {
 
     public Mono<UserReaction> apply(UserReaction domain) {
         if (!isPolicyEnable()) {
-            return Mono.empty();
+            return Mono.just(domain);
         }
         if (isTypeConfigured(domain.getDomainObjectType())) {
             if (properties.getTypes().get(domain.getDomainObjectType()).getEnable()) {

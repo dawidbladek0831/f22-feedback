@@ -36,10 +36,10 @@ class ReactionServiceImpl implements ReactionService {
                     .then(allowedUserReactionsPolicy.apply(command.domainObjectType(), command.reaction()))
                     .then(userReactionCreationPolicy.apply(command.domainObjectType(), command.domainObjectId(), command.userId())
                             .flatMap(domain -> singleUserReactionPolicy.apply(domain))
+                            .flatMap(domain -> likeDislikePolicy.apply(domain, command.reaction()))
                             .flatMap(domain -> {
                                 domain.addReaction(command.reaction());
-                                return likeDislikePolicy.apply(domain)
-                                        .then(mongoTemplate.save(domain))
+                                return mongoTemplate.save(domain)
                                         .then(eventPublisher.publish(new ReactionEvent.UserReactionAddedEvent(domain.getId(), domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getUserId(), command.reaction())))
                                         .thenReturn(domain);
                             }))
