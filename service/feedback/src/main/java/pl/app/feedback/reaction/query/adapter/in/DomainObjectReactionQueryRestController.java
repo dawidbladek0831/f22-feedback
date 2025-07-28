@@ -1,4 +1,4 @@
-package pl.app.feedback.reaction.query.adapter;
+package pl.app.feedback.reaction.query.adapter.in;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

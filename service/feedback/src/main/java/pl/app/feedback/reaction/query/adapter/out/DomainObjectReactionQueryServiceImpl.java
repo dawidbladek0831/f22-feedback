@@ -1,20 +1,15 @@
-package pl.app.feedback.reaction.query.adapter;
+package pl.app.feedback.reaction.query.adapter.out;
 
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import pl.app.feedback.reaction.application.domain.model.ReactionException;
 import pl.app.feedback.reaction.query.model.DomainObjectReaction;
 import pl.app.feedback.reaction.query.model.UserReaction;
 import pl.app.feedback.reaction.query.port.DomainObjectReactionQueryService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 @Component
 @RequiredArgsConstructor
