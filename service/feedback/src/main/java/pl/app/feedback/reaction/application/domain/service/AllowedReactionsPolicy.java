@@ -30,14 +30,14 @@ class AllowedReactionsPolicy {
         if (!isPolicyEnable()) {
             return Mono.empty();
         }
-        if(isTypeReactionsConfigured(domainObjectType)){
-            if(properties.getTypes().get(domainObjectType).getReactions().contains(reaction)){
+        if (isTypeReactionsConfigured(domainObjectType)) {
+            if (properties.getTypes().get(domainObjectType).getReactions().contains(reaction)) {
                 return Mono.empty();
             }
             throw ReactionException.InvalidReactionException.reaction(reaction);
         }
-        if(isDefaultReactionsConfigured()){
-            if(properties.getDefaultReactions().contains(reaction)){
+        if (isDefaultReactionsConfigured()) {
+            if (properties.getDefaultReactions().contains(reaction)) {
                 return Mono.empty();
             }
             throw ReactionException.InvalidReactionException.reaction(reaction);
@@ -65,17 +65,6 @@ class AllowedReactionsPolicy {
         private List<String> defaultReactions = List.of();
         private Map<String, Type> types = Map.of();
 
-        @Data
-        public static class Type {
-            private List<String> reactions = List.of();
-
-            public void normalize() {
-                this.reactions = this.reactions.stream()
-                        .map(String::toUpperCase)
-                        .toList();
-            }
-        }
-
         public void setDefaultReactions(List<String> defaultReactions) {
             this.defaultReactions = defaultReactions.stream()
                     .map(String::toUpperCase)
@@ -91,6 +80,17 @@ class AllowedReactionsPolicy {
                                 return e.getValue();
                             }
                     ));
+        }
+
+        @Data
+        public static class Type {
+            private List<String> reactions = List.of();
+
+            public void normalize() {
+                this.reactions = this.reactions.stream()
+                        .map(String::toUpperCase)
+                        .toList();
+            }
         }
     }
 }

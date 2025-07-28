@@ -5,6 +5,8 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import pl.app.feedback.reaction.application.domain.model.Reaction;
+import pl.app.feedback.reaction.application.domain.model.ReactionException;
 import pl.app.feedback.reaction.query.model.DomainObjectReaction;
 import pl.app.feedback.reaction.query.model.UserReaction;
 import pl.app.feedback.reaction.query.port.DomainObjectReactionQueryService;
@@ -26,6 +28,17 @@ class DomainObjectReactionQueryServiceImpl implements DomainObjectReactionQueryS
     public Mono<DomainObjectReaction> fetchBy(String domainObjectType, String domainObjectId) {
         return domainObjectReactionRepository.findOneByDomainObjectTypeAndDomainObjectId(domainObjectType, domainObjectId)
                 .defaultIfEmpty(new DomainObjectReaction(domainObjectType, domainObjectId));
+    }
+
+    @Override
+    public Mono<Reaction> fetchBy(String userId, String domainObjectType, String domainObjectId) {
+        return mongoTemplate.query(Reaction.class)
+                .matching(Query.query(Criteria
+                        .where("domainObjectType").is(domainObjectType)
+                        .and("domainObjectId").is(domainObjectId)
+                        .and("userId").is(userId)
+                )).one()
+                .switchIfEmpty(Mono.error(ReactionException.NotFoundReactionException::new));
     }
 
     @Override

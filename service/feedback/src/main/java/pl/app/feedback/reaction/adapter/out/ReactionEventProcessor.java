@@ -14,8 +14,8 @@ import java.time.Duration;
 @Component
 @RequiredArgsConstructor
 class ReactionEventProcessor {
-    private final ReadModelSynchronizer handler;
     private static final Logger logger = LoggerFactory.getLogger(ReactionEventProcessor.class);
+    private final ReadModelSynchronizer handler;
     private final Sinks.Many<Object> sink = Sinks.many().multicast().onBackpressureBuffer();
 
     @PostConstruct
@@ -30,8 +30,10 @@ class ReactionEventProcessor {
                         groupedFlux.concatMap(event ->
                                 Mono.delay(Duration.ofSeconds(1))
                                         .then(Mono.defer(() -> {
-                                            if (event instanceof ReactionEvent.ReactionAddedEvent e) return handler.handle(e);
-                                            if (event instanceof ReactionEvent.ReactionRemovedEvent e) return handler.handle(e);
+                                            if (event instanceof ReactionEvent.ReactionAddedEvent e)
+                                                return handler.handle(e);
+                                            if (event instanceof ReactionEvent.ReactionRemovedEvent e)
+                                                return handler.handle(e);
                                             logger.warn("unknown event: {}", event);
                                             return Mono.empty();
                                         }))

@@ -1,6 +1,7 @@
 package pl.app.feedback.reaction.application.domain.model;
 
-import pl.app.common.exception.*;
+import pl.app.common.exception.NotFoundException;
+import pl.app.common.exception.ValidationException;
 
 import java.text.MessageFormat;
 
@@ -36,6 +37,7 @@ public interface ReactionException {
             );
         }
     }
+
     class InvalidDomainObjectTypeException extends ValidationException {
         public InvalidDomainObjectTypeException() {
             super("domain object type is invalid");
@@ -51,6 +53,7 @@ public interface ReactionException {
             );
         }
     }
+
     class InvalidReactionException extends ValidationException {
         public InvalidReactionException() {
             super("reaction is invalid");

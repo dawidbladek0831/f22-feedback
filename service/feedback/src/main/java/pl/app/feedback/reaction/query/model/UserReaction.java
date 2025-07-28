@@ -1,6 +1,5 @@
 package pl.app.feedback.reaction.query.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
@@ -8,7 +7,10 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Document(collection = "user-reaction")
 @Data
@@ -24,13 +26,13 @@ public class UserReaction {
     public UserReaction(String userId) {
         this.id = ObjectId.get();
         this.userId = userId;
-        this.reactions= new ArrayList<>();
+        this.reactions = new ArrayList<>();
         this.version = null;
     }
 
     @Data
     @NoArgsConstructor
-    static public class Reaction{
+    static public class Reaction {
         private ObjectId id;
         private String domainObjectType;
         private String domainObjectId;

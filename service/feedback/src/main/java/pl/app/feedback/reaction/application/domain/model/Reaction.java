@@ -31,25 +31,26 @@ public class Reaction {
     }
 
     public void addReaction(String newReaction) {
-        if(containReaction(newReaction)){
+        if (containReaction(newReaction)) {
             throw ReactionException.DuplicatedReactionException.reaction(newReaction);
         }
         this.reactions.add(newReaction);
     }
 
     public void removeReaction(String reaction) {
-        if(!containReaction(reaction)){
+        if (!containReaction(reaction)) {
             throw ReactionException.NotFoundReactionException.reaction(reaction);
         }
         this.reactions.remove(reaction);
     }
+
     public Set<String> removeReactionAll() {
         var reactionsToRemove = new HashSet<>(this.reactions);
         this.reactions.clear();
         return reactionsToRemove;
     }
 
-    public boolean containReaction(String reaction){
+    public boolean containReaction(String reaction) {
         return this.reactions.contains(reaction);
     }
 }

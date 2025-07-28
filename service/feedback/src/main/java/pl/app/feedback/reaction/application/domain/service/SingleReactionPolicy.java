@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import pl.app.common.event.EventPublisher;
-import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
 import pl.app.feedback.reaction.application.domain.model.Reaction;
+import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;

@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Component;
 import pl.app.common.event.EventPublisher;
+import pl.app.feedback.reaction.application.domain.model.Reaction;
 import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
 import pl.app.feedback.reaction.application.domain.model.ReactionException;
-import pl.app.feedback.reaction.application.domain.model.Reaction;
 import pl.app.feedback.reaction.application.port.out.ReactionDomainRepository;
 import reactor.core.publisher.Mono;
 
@@ -29,11 +29,11 @@ class ReactionCreationPolicy {
     }
 
     private Mono<Reaction> create(String domainObjectType, String domainObjectId, String userId) {
-        return Mono.fromCallable(() ->{
-            var domain = new Reaction(domainObjectType, domainObjectId, userId);
-            return mongoTemplate.insert(domain)
-                    .then(eventPublisher.publish(new ReactionEvent.ReactionCreatedEvent(domain.getId(), domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getUserId())))
-                    .thenReturn(domain);
+        return Mono.fromCallable(() -> {
+                    var domain = new Reaction(domainObjectType, domainObjectId, userId);
+                    return mongoTemplate.insert(domain)
+                            .then(eventPublisher.publish(new ReactionEvent.ReactionCreatedEvent(domain.getId(), domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getUserId())))
+                            .thenReturn(domain);
                 }
 
         ).doOnSubscribe(subscription ->
