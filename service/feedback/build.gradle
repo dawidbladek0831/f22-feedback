@@ -40,6 +40,8 @@ dependencies {
 	// BROKER
 	implementation 'org.springframework.cloud:spring-cloud-stream'
 	implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
+	implementation 'org.apache.kafka:kafka-streams'
+	implementation 'org.springframework.kafka:spring-kafka'
 
 	// LOMBOK
 	compileOnly "org.projectlombok:lombok"

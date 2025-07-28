@@ -16,8 +16,8 @@ import java.util.Collection;
 @Component
 @Primary
 @RequiredArgsConstructor
-class KafkaEventPublisher implements EventPublisher {
-    private static final Logger logger = LoggerFactory.getLogger(KafkaEventPublisher.class);
+class CloudStreamEventPublisher implements EventPublisher {
+    private static final Logger logger = LoggerFactory.getLogger(CloudStreamEventPublisher.class);
     private static final String DEFAULT_SUFFIX = "-out-0";
     private final StreamBridge streamBridge;
 
@@ -38,7 +38,8 @@ class KafkaEventPublisher implements EventPublisher {
     }
 
     private Mono<Void> defaultEventPublish(Object event) {
-        return Mono.fromRunnable(() -> streamBridge.send(event.getClass().getSimpleName() + DEFAULT_SUFFIX, event));
+        var topic = event.getClass().getSimpleName().substring(0, 1).toLowerCase() + event.getClass().getSimpleName().substring(1) + DEFAULT_SUFFIX;
+        return Mono.fromRunnable(() -> streamBridge.send(topic , event));
     }
 
     @Override

@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.HashSet;
 import java.util.Set;
 
-@Document(collection = "user_reaction")
+@Document(collection = "reaction")
 @Getter
 @NoArgsConstructor
 public class Reaction {
