@@ -3,6 +3,7 @@ package pl.app.feedback.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
@@ -14,12 +15,18 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 @RequiredArgsConstructor
 public class WebConfig implements WebFluxConfigurer {
 
-    @Override
-    public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
-        ObjectMapper objectMapper = new Jackson2ObjectMapperBuilder()
+    @Bean
+    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {
+        return new Jackson2ObjectMapperBuilder()
                 .serializers(new JacksonConfig.ObjectIdSerializer(), new JacksonConfig.InstantSerializer())
                 .deserializers(new JacksonConfig.ObjectIdDeserializer(), new JacksonConfig.InstantDeserializer())
-                .build();
+                ;
+    }
+
+    @Override
+    public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
+        ObjectMapper objectMapper = jackson2ObjectMapperBuilder().build();
+
         objectMapper.configure(SerializationFeature.FLUSH_AFTER_WRITE_VALUE, true);
         configurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(objectMapper));
         configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(objectMapper));

@@ -18,11 +18,19 @@ public class KafkaTopicProperties {
     private Topic reactionAdded;
     private Topic reactionRemoved;
 
+    private Topic ratingCreated;
+    private Topic ratingUpdated;
+    private Topic ratingRemoved;
+
     public List<Topic> getAllTopics() {
         return List.of(
                 reactionCreated,
                 reactionAdded,
-                reactionRemoved
+                reactionRemoved,
+
+                ratingCreated,
+                ratingUpdated,
+                ratingRemoved
         );
     }
 
