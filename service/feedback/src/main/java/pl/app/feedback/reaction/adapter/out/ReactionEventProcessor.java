@@ -37,6 +37,7 @@ class ReactionEventProcessor {
                                             logger.warn("unknown event: {}", event);
                                             return Mono.empty();
                                         }))
+                                        .onErrorContinue((ex, obj) -> logger.error("Failed to process event: {}", obj, ex))
                         )
                 )
                 .subscribe();

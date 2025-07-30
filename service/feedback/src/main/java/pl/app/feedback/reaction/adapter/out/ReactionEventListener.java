@@ -18,6 +18,7 @@ import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
 class ReactionEventListener {
     private static final Logger logger = LoggerFactory.getLogger(ReactionEventListener.class);
     private final ReactionEventProcessor reactionEventProcessor;
+    private final ReadModelSynchronizer synchronizer;
 
 
     @KafkaListener(
@@ -28,9 +29,8 @@ class ReactionEventListener {
     public void reactionAddedEvent(ConsumerRecord<ObjectId, ReactionEvent.ReactionAddedEvent> record) {
         logger.debug("received event {} {}-{} key: {},value: {}", record.value().getClass().getSimpleName(), record.partition(), record.offset(), record.key(), record.value());
         final var event = record.value();
-        reactionEventProcessor.submit(event);
+        synchronizer.handle(event).subscribe();
     }
-
 
     @KafkaListener(
             id = "reaction-removed-event-listener--reaction",
@@ -40,7 +40,7 @@ class ReactionEventListener {
     public void reactionRemovedEvent(ConsumerRecord<ObjectId, ReactionEvent.ReactionRemovedEvent> record) {
         logger.debug("received event {} {}-{} key: {},value: {}", record.value().getClass().getSimpleName(), record.partition(), record.offset(), record.key(), record.value());
         final var event = record.value();
-        reactionEventProcessor.submit(event);
+        synchronizer.handle(event).subscribe();
     }
 
 }

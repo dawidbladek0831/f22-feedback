@@ -15,8 +15,6 @@ import pl.app.feedback.reaction.query.model.DomainObjectReaction;
 import pl.app.feedback.reaction.query.model.UserReaction;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
 @Component
 @RequiredArgsConstructor
 class ReadModelSynchronizer {
@@ -24,62 +22,42 @@ class ReadModelSynchronizer {
     private final ReactiveMongoTemplate mongoTemplate;
 
     public Mono<ReactionEvent.ReactionAddedEvent> handle(ReactionEvent.ReactionAddedEvent event) {
-        updateDomainObjectReaction(event.domainObjectType(), event.domainObjectId(), event.reaction(), 1).subscribe();
-        updateUserReaction(event.userId(), event.domainObjectType(), event.domainObjectId(), event.reaction(), true).subscribe();
-        return Mono.just(event);
+        return Mono.zip(
+                        mongoTemplate.findOne(Query.query(Criteria.where("domainObjectType").is(event.domainObjectType()).and("domainObjectId").is(event.domainObjectId())), DomainObjectReaction.class)
+                                .defaultIfEmpty(new DomainObjectReaction(event.domainObjectType(), event.domainObjectId()))
+                                .flatMap(readModel -> {
+                                    readModel.handle(event);
+                                    return mongoTemplate.save(readModel);
+                                }),
+                        mongoTemplate.findOne(Query.query(Criteria.where("userId").is(event.userId())), UserReaction.class)
+                                .defaultIfEmpty(new UserReaction(event.userId()))
+                                .flatMap(readModel -> {
+                                    readModel.handle(event);
+                                    return mongoTemplate.save(readModel);
+                                })
+                )
+                .doOnSuccess(obj -> logger.debug("updated Reaction read models: {}-{}", event.domainObjectType(), event.domainObjectId()))
+                .doOnError(e -> logger.error("error updating Reaction read models: {}-{}, {}", event.domainObjectType(), event.domainObjectId(), e.toString()))
+                .thenReturn(event);
     }
 
     public Mono<ReactionEvent.ReactionRemovedEvent> handle(ReactionEvent.ReactionRemovedEvent event) {
-        updateDomainObjectReaction(event.domainObjectType(), event.domainObjectId(), event.reaction(), -1).subscribe();
-        updateUserReaction(event.userId(), event.domainObjectType(), event.domainObjectId(), event.reaction(), false).subscribe();
-        return Mono.just(event);
-    }
-
-    private Mono<DomainObjectReaction> updateDomainObjectReaction(String domainObjectType, String domainObjectId, String reaction, int delta) {
-        Query query = Query.query(Criteria.where("domainObjectType").is(domainObjectType).and("domainObjectId").is(domainObjectId));
-        Update update = new Update().inc("reactions." + reaction, delta)
-                .setOnInsert("id", ObjectId.get())
-                .setOnInsert("domainObjectType", domainObjectType)
-                .setOnInsert("domainObjectId", domainObjectId);
-
-        return mongoTemplate.findAndModify(
-                        query,
-                        update,
-                        FindAndModifyOptions.options().returnNew(true).upsert(true),
-                        DomainObjectReaction.class
+        return Mono.zip(
+                        mongoTemplate.findOne(Query.query(Criteria.where("domainObjectType").is(event.domainObjectType()).and("domainObjectId").is(event.domainObjectId())), DomainObjectReaction.class)
+                                .defaultIfEmpty(new DomainObjectReaction(event.domainObjectType(), event.domainObjectId()))
+                                .flatMap(readModel -> {
+                                    readModel.handle(event);
+                                    return mongoTemplate.save(readModel);
+                                }),
+                        mongoTemplate.findOne(Query.query(Criteria.where("userId").is(event.userId())), UserReaction.class)
+                                .defaultIfEmpty(new UserReaction(event.userId()))
+                                .flatMap(readModel -> {
+                                    readModel.handle(event);
+                                    return mongoTemplate.save(readModel);
+                                })
                 )
-                .doOnSuccess(obj -> logger.debug("updated DomainObjectReaction: {}-{}", domainObjectType, domainObjectId))
-                .doOnError(e -> logger.error("error updating DomainObjectReaction: {}-{}, {}", domainObjectType, domainObjectId, e.toString()));
+                .doOnSuccess(obj -> logger.debug("updated Reaction read models: {}-{}", event.domainObjectType(), event.domainObjectId()))
+                .doOnError(e -> logger.error("error updating Reaction read models: {}-{}, {}", event.domainObjectType(), event.domainObjectId(), e.toString()))
+                .thenReturn(event);
     }
-
-    private Mono<UserReaction> updateUserReaction(String userId, String domainObjectType, String domainObjectId, String reactionType, boolean add) {
-        return mongoTemplate.findOne(Query.query(Criteria.where("userId").is(userId)), UserReaction.class)
-                .defaultIfEmpty(new UserReaction(userId))
-                .flatMap(userReaction -> {
-                    Optional<UserReaction.Reaction> optional = userReaction.getReactions().stream()
-                            .filter(r -> r.getDomainObjectType().equals(domainObjectType) && r.getDomainObjectId().equals(domainObjectId))
-                            .findFirst();
-                    if (optional.isPresent()) {
-                        if (add) {
-                            optional.get().getReactions().add(reactionType);
-                        } else {
-                            optional.get().getReactions().remove(reactionType);
-                        }
-                    } else {
-                        var reaction = new UserReaction.Reaction(
-                                domainObjectType,
-                                domainObjectId,
-                                userId
-                        );
-                        if (add) {
-                            reaction.getReactions().add(reactionType);
-                        }
-                        userReaction.getReactions().add(reaction);
-                    }
-                    return mongoTemplate.save(userReaction);
-                })
-                .doOnSuccess(obj -> logger.debug("updated UserReaction: {}-{}", domainObjectType, domainObjectId))
-                .doOnError(e -> logger.error("error updating UserReaction: {}-{}, {}", domainObjectType, domainObjectId, e.toString()));
-    }
-
 }

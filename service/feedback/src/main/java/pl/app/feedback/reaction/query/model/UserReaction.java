@@ -6,11 +6,9 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
+import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Document(collection = "user-reaction")
 @Data
@@ -28,6 +26,46 @@ public class UserReaction {
         this.userId = userId;
         this.reactions = new ArrayList<>();
         this.version = null;
+    }
+
+    public void handle(ReactionEvent.ReactionCreatedEvent event) {
+        getReaction(event.id()).ifPresentOrElse(
+                reaction -> {
+                },
+                () -> {
+                    var reaction = new UserReaction.Reaction(event.domainObjectType(), event.domainObjectId(), userId);
+                    reactions.add(reaction);
+                }
+        );
+    }
+
+    public void handle(ReactionEvent.ReactionAddedEvent event) {
+        getReaction(event.id()).ifPresentOrElse(
+                reaction -> {
+                    reaction.getReactions().add(event.reaction());
+                },
+                () -> {
+                    var reaction = new UserReaction.Reaction(event.domainObjectType(), event.domainObjectId(), userId);
+                    reaction.getReactions().add(event.reaction());
+                    reactions.add(reaction);
+                }
+        );
+    }
+
+    public void handle(ReactionEvent.ReactionRemovedEvent event) {
+        getReaction(event.id()).ifPresentOrElse(
+                reaction -> {
+                    reaction.getReactions().remove(event.reaction());
+                },
+                () -> {
+                }
+        );
+    }
+
+    private Optional<Reaction> getReaction(ObjectId reactionId) {
+        return reactions.stream()
+                .filter(r -> r.getId().equals(reactionId))
+                .findFirst();
     }
 
     @Data
