@@ -1,6 +1,7 @@
 package pl.app.feedback.reaction.application.domain.model;
 
 import org.bson.types.ObjectId;
+import pl.app.common.event.DomainObjectEvent;
 
 public interface ReactionEvent {
     record ReactionCreatedEvent(
@@ -8,7 +9,7 @@ public interface ReactionEvent {
             String domainObjectType,
             String domainObjectId,
             String userId
-    ) {
+    ) implements DomainObjectEvent {
     }
 
     record ReactionAddedEvent(
@@ -17,7 +18,7 @@ public interface ReactionEvent {
             String domainObjectId,
             String userId,
             String reaction
-    ) {
+    ) implements DomainObjectEvent {
     }
 
     record ReactionRemovedEvent(
@@ -26,6 +27,6 @@ public interface ReactionEvent {
             String domainObjectId,
             String userId,
             String reaction
-    ) {
+    ) implements DomainObjectEvent {
     }
 }

@@ -1,6 +1,7 @@
 package pl.app.feedback.rating.application.domain.model;
 
 import org.bson.types.ObjectId;
+import pl.app.common.event.DomainObjectEvent;
 
 public interface RatingEvent {
     record RatingCreatedEvent(
@@ -9,7 +10,7 @@ public interface RatingEvent {
             String domainObjectId,
             String userId,
             Double rating
-    ) {
+    ) implements DomainObjectEvent {
     }
 
     record RatingUpdatedEvent(
@@ -19,7 +20,7 @@ public interface RatingEvent {
             String userId,
             Double rating,
             Double oldRating
-    ) {
+    ) implements DomainObjectEvent {
     }
 
     record RatingRemovedEvent(
@@ -28,6 +29,6 @@ public interface RatingEvent {
             String domainObjectId,
             String userId,
             Double rating
-    ) {
+    ) implements DomainObjectEvent {
     }
 }

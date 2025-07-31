@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerInterceptor;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -25,18 +24,15 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
-import org.springframework.kafka.listener.CommonErrorHandler;
-import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
-import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.kafka.listener.*;
+import org.springframework.kafka.support.ExponentialBackOffWithMaxRetries;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import org.springframework.util.backoff.FixedBackOff;
+import org.springframework.util.backoff.BackOff;
 import reactor.core.publisher.Flux;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -101,20 +97,38 @@ public class KafkaConfig {
 
         @Bean
         CommonErrorHandler commonErrorHandler(
-                KafkaTemplate<ObjectId, Object> objectIdTemplate
+                BackOff defaultBackOff,
+                ConsumerRecordRecoverer deadLetterRecoverer
+        ) {
+            CommonErrorHandler defaultErrorHandler = new DefaultErrorHandler(deadLetterRecoverer, defaultBackOff);
+//            defaultErrorHandler.addNotRetryableExceptions();
+            return defaultErrorHandler;
+        }
+
+        @Bean
+        ConsumerRecordRecoverer deadLetterRecoverer(
+                KafkaTemplate<ObjectId, Object> objectIdTemplate,
+                KafkaTopicProperties properties
         ) {
             Map<Class<?>, KafkaOperations<?, ?>> templates = new LinkedHashMap<>() {{
                 put(Object.class, objectIdTemplate);
             }};
-            DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(templates, new BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition>() {
-                @Override
-                public TopicPartition apply(ConsumerRecord<?, ?> consumerRecord, Exception e) {
-                    final String topicName = consumerRecord.topic() + ".DTL";
-                    logger.debug("send unprocessed event to: {}, event: {}, because of exception: {}", topicName, consumerRecord.value(), e.getCause().getMessage());
-                    return new TopicPartition(topicName, 0);
-                }
+
+            ConsumerRecordRecoverer deadLetterRecoverer = new DeadLetterPublishingRecoverer(templates, (consumerRecord, ex) -> {
+                var destinationTopicName = properties.getTopic(consumerRecord.value()).getDtlTopicName();
+                logger.error("send unprocessed event to: {}, event: {}, because of exception: {}", destinationTopicName, consumerRecord.value(), ex.getCause().getMessage());
+                return new TopicPartition(destinationTopicName, -1);  //If the returned TopicPartition has a negative partition, the partition is not set in the ProducerRecord, so the partition is selected by Kafka
             });
-            return new DefaultErrorHandler(recoverer, new FixedBackOff(3_000L, 1L));
+            return deadLetterRecoverer;
+        }
+
+        @Bean
+        BackOff defaultBackOff() {
+            ExponentialBackOffWithMaxRetries defaultBackOff = new ExponentialBackOffWithMaxRetries(6);
+            defaultBackOff.setInitialInterval(1_000L);
+            defaultBackOff.setMultiplier(2.0);
+            defaultBackOff.setMaxInterval(10_000L);
+            return defaultBackOff;
         }
 
         @Bean

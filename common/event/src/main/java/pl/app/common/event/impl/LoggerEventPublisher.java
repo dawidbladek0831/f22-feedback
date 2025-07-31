@@ -1,15 +1,13 @@
-package pl.app.feedback.shared;
+package pl.app.common.event.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import pl.app.common.event.EventPublisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 
-@Component
 class LoggerEventPublisher implements EventPublisher {
     private static final Logger logger = LoggerFactory.getLogger(LoggerEventPublisher.class);
 

@@ -10,15 +10,12 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
 
-//reactor.core.Exceptions$ErrorCallbackNotImplemented: org.springframework.dao.OptimisticLockingFailureException: Optimistic lock exception on saving entity pl.app.feedback.reaction.query.model.UserReaction to collection user-reaction
-
 @Component
 @ConditionalOnProperty(value = "app.kafka.listeners.enable", matchIfMissing = true)
 @RequiredArgsConstructor
 class ReactionEventListener {
     private static final Logger logger = LoggerFactory.getLogger(ReactionEventListener.class);
-    private final ReactionEventProcessor reactionEventProcessor;
-    private final ReadModelSynchronizer synchronizer;
+    private final ReactionReadModelSynchronizer synchronizer;
 
 
     @KafkaListener(
@@ -29,7 +26,7 @@ class ReactionEventListener {
     public void reactionAddedEvent(ConsumerRecord<ObjectId, ReactionEvent.ReactionAddedEvent> record) {
         logger.debug("received event {} {}-{} key: {},value: {}", record.value().getClass().getSimpleName(), record.partition(), record.offset(), record.key(), record.value());
         final var event = record.value();
-        synchronizer.handle(event).subscribe();
+        synchronizer.handle(event).block();
     }
 
     @KafkaListener(
@@ -40,7 +37,7 @@ class ReactionEventListener {
     public void reactionRemovedEvent(ConsumerRecord<ObjectId, ReactionEvent.ReactionRemovedEvent> record) {
         logger.debug("received event {} {}-{} key: {},value: {}", record.value().getClass().getSimpleName(), record.partition(), record.offset(), record.key(), record.value());
         final var event = record.value();
-        synchronizer.handle(event).subscribe();
+        synchronizer.handle(event).block();
     }
 
 }
