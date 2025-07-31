@@ -15,29 +15,49 @@ import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
 @RequiredArgsConstructor
 class ReactionEventListener {
     private static final Logger logger = LoggerFactory.getLogger(ReactionEventListener.class);
-    private final ReactionReadModelSynchronizer synchronizer;
+    private final UserReactionReadModelSynchronizer userReactionReadModelSynchronizer;
+    private final DomainObjectReactionReadModelSynchronizer domainObjectReactionReadModelSynchronizer;
 
 
     @KafkaListener(
-            id = "reaction-added-event-listener--reaction",
-            groupId = "${app.kafka.consumer.group-id}--reaction",
+            id = "reaction-added-event-listener--reaction--user-reaction-synchronizer",
+            groupId = "${app.kafka.consumer.group-id}--reaction--user-reaction-synchronizer",
             topics = "${app.kafka.topic.reaction-added.name}"
     )
     public void reactionAddedEvent(ConsumerRecord<ObjectId, ReactionEvent.ReactionAddedEvent> record) {
         logger.debug("received event {} {}-{} key: {},value: {}", record.value().getClass().getSimpleName(), record.partition(), record.offset(), record.key(), record.value());
-        final var event = record.value();
-        synchronizer.handle(event).block();
+        userReactionReadModelSynchronizer.handle(record.value()).block();
     }
 
     @KafkaListener(
-            id = "reaction-removed-event-listener--reaction",
-            groupId = "${app.kafka.consumer.group-id}--reaction",
+            id = "reaction-removed-event-listener--reaction--user-reaction-synchronizer",
+            groupId = "${app.kafka.consumer.group-id}--reaction--user-reaction-synchronizer",
             topics = "${app.kafka.topic.reaction-removed.name}"
     )
     public void reactionRemovedEvent(ConsumerRecord<ObjectId, ReactionEvent.ReactionRemovedEvent> record) {
         logger.debug("received event {} {}-{} key: {},value: {}", record.value().getClass().getSimpleName(), record.partition(), record.offset(), record.key(), record.value());
-        final var event = record.value();
-        synchronizer.handle(event).block();
+        userReactionReadModelSynchronizer.handle(record.value()).block();
+    }
+
+
+    @KafkaListener(
+            id = "reaction-added-event-listener--reaction--domain-object-reaction",
+            groupId = "${app.kafka.consumer.group-id}--reaction--domain-object-reaction",
+            topics = "${app.kafka.topic.reaction-added.name}"
+    )
+    public void reactionAddedEvent2(ConsumerRecord<ObjectId, ReactionEvent.ReactionAddedEvent> record) {
+        logger.debug("received event {} {}-{} key: {},value: {}", record.value().getClass().getSimpleName(), record.partition(), record.offset(), record.key(), record.value());
+        domainObjectReactionReadModelSynchronizer.handle(record.value()).block();
+    }
+
+    @KafkaListener(
+            id = "reaction-removed-event-listener--reaction--domain-object-reaction",
+            groupId = "${app.kafka.consumer.group-id}--reaction--domain-object-reaction",
+            topics = "${app.kafka.topic.reaction-removed.name}"
+    )
+    public void reactionRemovedEvent2(ConsumerRecord<ObjectId, ReactionEvent.ReactionRemovedEvent> record) {
+        logger.debug("received event {} {}-{} key: {},value: {}", record.value().getClass().getSimpleName(), record.partition(), record.offset(), record.key(), record.value());
+        domainObjectReactionReadModelSynchronizer.handle(record.value()).block();
     }
 
 }

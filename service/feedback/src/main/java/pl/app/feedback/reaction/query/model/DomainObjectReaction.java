@@ -1,5 +1,6 @@
 package pl.app.feedback.reaction.query.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
@@ -16,11 +17,13 @@ import java.util.Map;
 @NoArgsConstructor
 public class DomainObjectReaction {
     @Id
+    @JsonIgnore
     private ObjectId id;
     private String domainObjectType;
     private String domainObjectId;
     private Map<String, Integer> reactions;
     @Version
+    @JsonIgnore
     private Long version;
 
     public DomainObjectReaction(String domainObjectType, String domainObjectId) {

@@ -8,16 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
 import pl.app.feedback.reaction.query.port.DomainObjectReactionQueryService;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(MockitoExtension.class)
-class ReactionReadModelSynchronizerTest {
+class UserReactionReadModelSynchronizerTest {
     @Autowired
-    private ReactionReadModelSynchronizer service;
+    private UserReactionReadModelSynchronizer service;
 
     @Autowired
     private DomainObjectReactionQueryService queryService;

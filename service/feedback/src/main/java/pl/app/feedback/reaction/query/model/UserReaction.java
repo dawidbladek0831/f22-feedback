@@ -1,5 +1,6 @@
 package pl.app.feedback.reaction.query.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
@@ -15,10 +16,12 @@ import java.util.*;
 @NoArgsConstructor
 public class UserReaction {
     @Id
+    @JsonIgnore
     private ObjectId id;
     private String userId;
     private List<Reaction> reactions;
     @Version
+    @JsonIgnore
     private Long version;
 
     public UserReaction(String userId) {
@@ -28,24 +31,13 @@ public class UserReaction {
         this.version = null;
     }
 
-    public void handle(ReactionEvent.ReactionCreatedEvent event) {
-        getReaction(event.id()).ifPresentOrElse(
-                reaction -> {
-                },
-                () -> {
-                    var reaction = new UserReaction.Reaction(event.domainObjectType(), event.domainObjectId(), userId);
-                    reactions.add(reaction);
-                }
-        );
-    }
-
     public void handle(ReactionEvent.ReactionAddedEvent event) {
         getReaction(event.id()).ifPresentOrElse(
                 reaction -> {
                     reaction.getReactions().add(event.reaction());
                 },
                 () -> {
-                    var reaction = new UserReaction.Reaction(event.domainObjectType(), event.domainObjectId(), userId);
+                    var reaction = new UserReaction.Reaction(event.id(), event.domainObjectType(), event.domainObjectId(), userId);
                     reaction.getReactions().add(event.reaction());
                     reactions.add(reaction);
                 }
@@ -65,7 +57,7 @@ public class UserReaction {
     private Optional<Reaction> getReaction(ObjectId reactionId) {
         return reactions.stream()
                 .filter(r -> r.getId().equals(reactionId))
-                .findFirst();
+                .findAny();
     }
 
     @Data
@@ -77,8 +69,8 @@ public class UserReaction {
         private String userId;
         private Set<String> reactions;
 
-        public Reaction(String domainObjectType, String domainObjectId, String userId) {
-            this.id = ObjectId.get();
+        public Reaction(ObjectId id, String domainObjectType, String domainObjectId, String userId) {
+            this.id = id;
             this.domainObjectType = domainObjectType;
             this.domainObjectId = domainObjectId;
             this.userId = userId;
