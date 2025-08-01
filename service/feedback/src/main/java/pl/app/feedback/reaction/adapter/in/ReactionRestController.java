@@ -15,28 +15,22 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 class ReactionRestController {
     public static final String resourceName = "reactions";
-    public static final String resourcePath = "/api/v1/users/{userId}/objects/{domainObjectType}/{domainObjectId}/" + resourceName;
+    public static final String resourcePath = "/api/v1/" + resourceName;
     private final ReactionService service;
 
-    @PostMapping("/{reaction}")
+    @PostMapping
     Mono<ResponseEntity<Reaction>> add(
-            @PathVariable String userId,
-            @PathVariable String domainObjectType,
-            @PathVariable String domainObjectId,
-            @PathVariable String reaction
+            @RequestBody ReactionCommand.AddReactionCommand command
     ) {
-        return service.add(new ReactionCommand.AddReactionCommand(domainObjectType, domainObjectId, userId, reaction))
+        return service.add(command)
                 .map(e -> ResponseEntity.status(HttpStatus.OK).body(e));
     }
 
-    @DeleteMapping("/{reaction}")
+    @DeleteMapping
     Mono<ResponseEntity<Reaction>> remove(
-            @PathVariable String userId,
-            @PathVariable String domainObjectType,
-            @PathVariable String domainObjectId,
-            @PathVariable String reaction
+            @RequestBody ReactionCommand.RemoveReactionCommand command
     ) {
-        return service.remove(new ReactionCommand.RemoveReactionCommand(domainObjectType, domainObjectId, userId, reaction))
+        return service.remove(command)
                 .map(e -> ResponseEntity.status(HttpStatus.OK).body(e));
     }
 }

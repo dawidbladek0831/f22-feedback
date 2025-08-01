@@ -11,7 +11,9 @@ public interface DomainObjectReactionQueryService {
 
     Mono<DomainObjectReaction> fetchBy(String domainObjectType, String domainObjectId);
 
+    Mono<UserReaction> fetchBy(String userId);
+
     Mono<Reaction> fetchBy(String userId, String domainObjectType, String domainObjectId);
 
-    Mono<UserReaction> fetchBy(String userId);
+    Flux<Reaction> fetchAllBy(String userId, String domainObjectType, String domainObjectId);
 }

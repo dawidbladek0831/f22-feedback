@@ -13,6 +13,8 @@ import pl.app.feedback.reaction.query.port.DomainObjectReactionQueryService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @Component
 @RequiredArgsConstructor
 class DomainObjectReactionQueryServiceImpl implements DomainObjectReactionQueryService {
@@ -31,6 +33,12 @@ class DomainObjectReactionQueryServiceImpl implements DomainObjectReactionQueryS
     }
 
     @Override
+    public Mono<UserReaction> fetchBy(String userId) {
+        return mongoTemplate.findOne(Query.query(Criteria.where("userId").is(userId)), UserReaction.class)
+                .defaultIfEmpty(new UserReaction(userId));
+    }
+
+    @Override
     public Mono<Reaction> fetchBy(String userId, String domainObjectType, String domainObjectId) {
         return mongoTemplate.query(Reaction.class)
                 .matching(Query.query(Criteria
@@ -42,8 +50,18 @@ class DomainObjectReactionQueryServiceImpl implements DomainObjectReactionQueryS
     }
 
     @Override
-    public Mono<UserReaction> fetchBy(String userId) {
-        return mongoTemplate.findOne(Query.query(Criteria.where("userId").is(userId)), UserReaction.class)
-                .defaultIfEmpty(new UserReaction(userId));
+    public Flux<Reaction> fetchAllBy(String userId, String domainObjectType, String domainObjectId) {
+        Criteria criteria = new Criteria();
+        if (Objects.nonNull(userId)) {
+            criteria = criteria.and("userId").is(userId);
+        }
+        if (Objects.nonNull(domainObjectType)) {
+            criteria = criteria.and("domainObjectType").is(domainObjectType);
+        }
+        if (Objects.nonNull(domainObjectId)) {
+            criteria = criteria.and("domainObjectId").is(domainObjectId);
+        }
+        return mongoTemplate.query(Reaction.class)
+                .matching(Query.query(criteria)).all();
     }
 }
