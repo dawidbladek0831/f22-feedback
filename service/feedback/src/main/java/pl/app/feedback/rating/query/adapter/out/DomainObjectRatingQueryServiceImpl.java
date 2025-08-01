@@ -10,8 +10,10 @@ import pl.app.feedback.rating.application.domain.model.RatingException;
 import pl.app.feedback.rating.query.model.DomainObjectRating;
 import pl.app.feedback.rating.query.model.UserRating;
 import pl.app.feedback.rating.query.port.DomainObjectRatingQueryService;
-import pl.app.feedback.reaction.application.domain.model.ReactionException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -29,6 +31,12 @@ class DomainObjectRatingQueryServiceImpl implements DomainObjectRatingQueryServi
     }
 
     @Override
+    public Mono<UserRating> fetchBy(String userId) {
+        return mongoTemplate.findOne(Query.query(Criteria.where("userId").is(userId)), UserRating.class)
+                .defaultIfEmpty(new UserRating(userId));
+    }
+
+    @Override
     public Mono<Rating> fetchBy(String userId, String domainObjectType, String domainObjectId) {
         return mongoTemplate.query(Rating.class)
                 .matching(Query.query(Criteria
@@ -40,8 +48,18 @@ class DomainObjectRatingQueryServiceImpl implements DomainObjectRatingQueryServi
     }
 
     @Override
-    public Mono<UserRating> fetchBy(String userId) {
-        return mongoTemplate.findOne(Query.query(Criteria.where("userId").is(userId)), UserRating.class)
-                .defaultIfEmpty(new UserRating(userId));
+    public Flux<Rating> fetchAllBy(String userId, String domainObjectType, String domainObjectId) {
+        Criteria criteria = new Criteria();
+        if (Objects.nonNull(userId)) {
+            criteria = criteria.and("userId").is(userId);
+        }
+        if (Objects.nonNull(domainObjectType)) {
+            criteria = criteria.and("domainObjectType").is(domainObjectType);
+        }
+        if (Objects.nonNull(domainObjectId)) {
+            criteria = criteria.and("domainObjectId").is(domainObjectId);
+        }
+        return mongoTemplate.query(Rating.class)
+                .matching(Query.query(criteria)).all();
     }
 }

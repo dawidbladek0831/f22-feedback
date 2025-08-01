@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import pl.app.feedback.rating.application.domain.model.Rating;
 import pl.app.feedback.rating.application.port.in.RatingCommand;
 import pl.app.feedback.rating.application.port.in.RatingService;
-import pl.app.feedback.reaction.application.domain.model.Reaction;
-import pl.app.feedback.reaction.application.port.in.ReactionCommand;
 import reactor.core.publisher.Mono;
 
 //TODO get userId from token
@@ -17,27 +15,22 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 class RatingRestController {
     public static final String resourceName = "ratings";
-    public static final String resourcePath = "/api/v1/users/{userId}/objects/{domainObjectType}/{domainObjectId}/" + resourceName;
+    public static final String resourcePath = "/api/v1/" + resourceName;
     private final RatingService service;
 
-    @PostMapping("/{rating}")
+    @PostMapping
     Mono<ResponseEntity<Rating>> create(
-            @PathVariable String userId,
-            @PathVariable String domainObjectType,
-            @PathVariable String domainObjectId,
-            @PathVariable Double rating
+            @RequestBody RatingCommand.CrateRatingCommand command
     ) {
-        return service.create(new RatingCommand.CrateRatingCommand(domainObjectType, domainObjectId, userId, rating))
+        return service.create(command)
                 .map(e -> ResponseEntity.status(HttpStatus.OK).body(e));
     }
 
     @DeleteMapping
     Mono<ResponseEntity<Rating>> remove(
-            @PathVariable String userId,
-            @PathVariable String domainObjectType,
-            @PathVariable String domainObjectId
+            @RequestBody RatingCommand.RemoveRatingCommand command
     ) {
-        return service.remove(new RatingCommand.RemoveRatingCommand(domainObjectType, domainObjectId, userId))
+        return service.remove(command)
                 .map(e -> ResponseEntity.status(HttpStatus.OK).body(e));
     }
 }

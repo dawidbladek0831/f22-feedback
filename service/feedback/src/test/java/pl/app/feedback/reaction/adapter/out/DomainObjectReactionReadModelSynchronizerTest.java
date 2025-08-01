@@ -14,9 +14,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(MockitoExtension.class)
-class UserReactionReadModelSynchronizerTest {
+class DomainObjectReactionReadModelSynchronizerTest {
     @Autowired
-    private UserReactionReadModelSynchronizer service;
+    private DomainObjectReactionReadModelSynchronizer service;
 
     @Autowired
     private DomainObjectReactionQueryService queryService;
@@ -45,10 +45,10 @@ class UserReactionReadModelSynchronizerTest {
                 .verifyComplete();
         StepVerifier.create(
                         queryService.fetchBy(domainObjectType, domainObjectId)
-                ).assertNext(userRating -> {
-                    assertThat(userRating.getReactions()).hasSize(2);
-                    assertThat(userRating.getReactions().get("LIKE")).isEqualTo(1);
-                    assertThat(userRating.getReactions().get("DISLIKE")).isEqualTo(1);
+                ).assertNext(readModel -> {
+                    assertThat(readModel.getReactions()).hasSize(2);
+                    assertThat(readModel.getReactions().get("LIKE")).isEqualTo(1);
+                    assertThat(readModel.getReactions().get("DISLIKE")).isEqualTo(1);
                 })
                 .verifyComplete();
     }
