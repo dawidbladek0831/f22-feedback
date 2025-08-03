@@ -1,6 +1,8 @@
 package pl.app.feedback.rating.query.service;
 
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -23,7 +25,7 @@ class DomainObjectRatingQueryServiceImpl implements DomainObjectRatingQueryServi
     private final RatingMapper mapper;
 
     @Override
-    public Mono<DomainObjectRating> fetchBy(String domainObjectType, String domainObjectId) {
+    public Mono<DomainObjectRating> fetchDomainObjectRating(String domainObjectType, String domainObjectId) {
         return mongoTemplate.query(DomainObjectRating.class)
                 .matching(Query.query(Criteria
                         .where("domainObjectType").is(domainObjectType)
@@ -33,7 +35,7 @@ class DomainObjectRatingQueryServiceImpl implements DomainObjectRatingQueryServi
     }
 
     @Override
-    public Flux<RatingDto> fetchBy(String userId) {
+    public Flux<RatingDto> fetchUserRating(String userId) {
         return mongoTemplate.findOne(Query.query(Criteria.where("userId").is(userId)), UserRating.class)
                 .defaultIfEmpty(new UserRating(userId))
                 .map(UserRating::getRatings)
@@ -54,7 +56,7 @@ class DomainObjectRatingQueryServiceImpl implements DomainObjectRatingQueryServi
     }
 
     @Override
-    public Flux<RatingDto> fetchAllBy(String userId, String domainObjectType, String domainObjectId) {
+    public Flux<RatingDto> fetchAllBy(String userId, String domainObjectType, String domainObjectId, String cursor, Integer pageSize) {
         Criteria criteria = new Criteria();
         if (Objects.nonNull(userId)) {
             criteria = criteria.and("userId").is(userId);
@@ -65,8 +67,19 @@ class DomainObjectRatingQueryServiceImpl implements DomainObjectRatingQueryServi
         if (Objects.nonNull(domainObjectId)) {
             criteria = criteria.and("domainObjectId").is(domainObjectId);
         }
+        if (Objects.nonNull(cursor)) {
+            if (ObjectId.isValid(cursor)) {
+                criteria = criteria.and("_id").gt(new ObjectId(cursor));
+            }
+        }
+        if (Objects.isNull(pageSize)) {
+            pageSize = 50;
+        }
+        Query query = Query.query(criteria).limit(pageSize)
+                .with(Sort.by(Sort.Direction.ASC, "_id"));
         return mongoTemplate.query(Rating.class)
-                .matching(Query.query(criteria)).all()
+                .matching(query)
+                .all()
                 .map(e -> mapper.map(e, RatingDto.class));
     }
 }

@@ -6,11 +6,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface DomainObjectRatingQueryService {
-    Mono<DomainObjectRating> fetchBy(String domainObjectType, String domainObjectId);
+    Mono<DomainObjectRating> fetchDomainObjectRating(String domainObjectType, String domainObjectId);
 
-    Flux<RatingDto> fetchBy(String userId);
+    Flux<RatingDto> fetchUserRating(String userId);
 
     Mono<RatingDto> fetchBy(String userId, String domainObjectType, String domainObjectId);
 
-    Flux<RatingDto> fetchAllBy(String userId, String domainObjectType, String domainObjectId);
+    Flux<RatingDto> fetchAllBy(String userId, String domainObjectType, String domainObjectId, String cursor, Integer pageSize);
 }

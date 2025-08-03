@@ -35,7 +35,7 @@ class DomainObjectRatingReadModelSynchronizerTest {
                 .verifyComplete();
 
         StepVerifier.create(
-                        queryService.fetchBy(domainObjectType, domainObjectId)
+                        queryService.fetchDomainObjectRating(domainObjectType, domainObjectId)
                 ).assertNext(userRating -> {
                     assertThat(userRating.getQuantity()).isEqualTo(1);
                     assertThat(userRating.getRating()).isEqualTo(firstRating);
@@ -63,7 +63,7 @@ class DomainObjectRatingReadModelSynchronizerTest {
                 .verifyComplete();
 
         StepVerifier.create(
-                        queryService.fetchBy(domainObjectType, domainObjectId)
+                        queryService.fetchDomainObjectRating(domainObjectType, domainObjectId)
                 ).assertNext(userRating -> {
                     assertThat(userRating.getQuantity()).isEqualTo(1);
                     assertThat(userRating.getRating()).isEqualTo(secondRating);
@@ -94,7 +94,7 @@ class DomainObjectRatingReadModelSynchronizerTest {
                 .expectNextCount(1)
                 .verifyComplete();
         StepVerifier.create(
-                        queryService.fetchBy(domainObjectType, domainObjectId)
+                        queryService.fetchDomainObjectRating(domainObjectType, domainObjectId)
                 ).assertNext(userRating -> {
                     assertThat(userRating.getQuantity()).isEqualTo(0);
                     assertThat(userRating.getRating()).isEqualTo(0);
@@ -123,7 +123,7 @@ class DomainObjectRatingReadModelSynchronizerTest {
                 .verifyComplete();
 
         StepVerifier.create(
-                        queryService.fetchBy(domainObjectType, domainObjectId)
+                        queryService.fetchDomainObjectRating(domainObjectType, domainObjectId)
                 ).assertNext(userRating -> {
                     assertThat(userRating.getQuantity()).isEqualTo(2);
                     assertThat(userRating.getRating()).isEqualTo((firstRating + firstRating2) / 2);

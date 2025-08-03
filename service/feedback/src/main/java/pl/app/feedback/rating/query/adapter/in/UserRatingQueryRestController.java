@@ -24,6 +24,6 @@ class UserRatingQueryRestController {
     Mono<ResponseEntity<Flux<RatingDto>>> fetchBy(
             @PathVariable String userId
     ) {
-        return Mono.just(ResponseEntity.ok(queryService.fetchBy(userId)));
+        return Mono.just(ResponseEntity.ok(queryService.fetchUserRating(userId)));
     }
 }

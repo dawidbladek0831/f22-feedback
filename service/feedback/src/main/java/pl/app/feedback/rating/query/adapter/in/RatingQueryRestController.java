@@ -23,9 +23,11 @@ class RatingQueryRestController {
     Mono<ResponseEntity<Flux<RatingDto>>> fetchAllBy(
             @RequestParam(required = false) String userId,
             @RequestParam(required = false) String domainObjectType,
-            @RequestParam(required = false) String domainObjectId
+            @RequestParam(required = false) String domainObjectId,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(required = false) Integer pageSize
     ) {
-        return Mono.just(ResponseEntity.ok(queryService.fetchAllBy(userId, domainObjectType, domainObjectId)));
+        return Mono.just(ResponseEntity.ok(queryService.fetchAllBy(userId, domainObjectType, domainObjectId, cursor, pageSize)));
     }
 
 }

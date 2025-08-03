@@ -38,7 +38,7 @@ class UserRatingReadModelSynchronizerTest {
                 .verifyComplete();
 
         StepVerifier.create(
-                        queryService.fetchBy(userId)
+                        queryService.fetchUserRating(userId)
                 ).assertNext(userRating -> {
                     assertThat(userRating.getRatings()).hasSize(1);
                     assertThat(userRating.getRatings().get(0).getId()).isEqualTo(domainId);
@@ -70,7 +70,7 @@ class UserRatingReadModelSynchronizerTest {
                 .verifyComplete();
 
         StepVerifier.create(
-                        queryService.fetchBy(userId)
+                        queryService.fetchUserRating(userId)
                 ).assertNext(userRating -> {
                     assertThat(userRating.getRatings()).hasSize(1);
                     assertThat(userRating.getRatings().get(0).getId()).isEqualTo(domainId);
@@ -106,7 +106,7 @@ class UserRatingReadModelSynchronizerTest {
                 .verifyComplete();
 
         StepVerifier.create(
-                        queryService.fetchBy(userId)
+                        queryService.fetchUserRating(userId)
                 ).assertNext(userRating -> {
                     assertThat(userRating.getRatings()).hasSize(0);
                 })

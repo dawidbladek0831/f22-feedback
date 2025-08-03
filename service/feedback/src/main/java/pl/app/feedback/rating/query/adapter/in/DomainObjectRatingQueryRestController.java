@@ -24,7 +24,7 @@ class DomainObjectRatingQueryRestController {
             @PathVariable String domainObjectType,
             @PathVariable String domainObjectId
     ) {
-        return queryService.fetchBy(domainObjectType, domainObjectId)
+        return queryService.fetchDomainObjectRating(domainObjectType, domainObjectId)
                 .map(ResponseEntity::ok);
     }
 }
