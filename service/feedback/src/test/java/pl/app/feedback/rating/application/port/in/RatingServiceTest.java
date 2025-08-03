@@ -8,8 +8,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import pl.app.common.event.EventPublisher;
 import pl.app.feedback.rating.application.domain.model.RatingEvent;
@@ -36,7 +34,7 @@ class RatingServiceTest {
         var rating = 5d;
 
         StepVerifier.create(
-                service.create(new RatingCommand.CrateRatingCommand(domainObjectType, domainObjectId, userId, rating))
+                service.upsert(new RatingCommand.UpsertRatingCommand(domainObjectType, domainObjectId, userId, rating))
         ).assertNext(domain -> {
             assertThat(domain).isNotNull();
             assertThat(domain.getDomainObjectType()).isEqualTo(domainObjectType);
@@ -57,12 +55,12 @@ class RatingServiceTest {
         var firstRating = 15d;
         var secondRating = 5d;
 
-        service.create(new RatingCommand.CrateRatingCommand(domainObjectType, domainObjectId, userId, firstRating)).block();
+        service.upsert(new RatingCommand.UpsertRatingCommand(domainObjectType, domainObjectId, userId, firstRating)).block();
 
         Mockito.reset(eventPublisher);
 
         StepVerifier.create(
-                service.create(new RatingCommand.CrateRatingCommand(domainObjectType, domainObjectId, userId, secondRating))
+                service.upsert(new RatingCommand.UpsertRatingCommand(domainObjectType, domainObjectId, userId, secondRating))
         ).assertNext(domain -> {
             assertThat(domain).isNotNull();
             assertThat(domain.getRating()).isEqualTo(secondRating);

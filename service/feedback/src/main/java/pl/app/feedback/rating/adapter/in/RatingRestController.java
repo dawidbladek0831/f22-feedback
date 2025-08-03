@@ -9,7 +9,6 @@ import pl.app.feedback.rating.application.port.in.RatingCommand;
 import pl.app.feedback.rating.application.port.in.RatingService;
 import reactor.core.publisher.Mono;
 
-//TODO get userId from token
 @RestController
 @RequestMapping(RatingRestController.resourcePath)
 @RequiredArgsConstructor
@@ -18,11 +17,11 @@ class RatingRestController {
     public static final String resourcePath = "/api/v1/" + resourceName;
     private final RatingService service;
 
-    @PostMapping
-    Mono<ResponseEntity<Rating>> create(
-            @RequestBody RatingCommand.CrateRatingCommand command
+    @PutMapping
+    Mono<ResponseEntity<Rating>> upsert(
+            @RequestBody RatingCommand.UpsertRatingCommand command
     ) {
-        return service.create(command)
+        return service.upsert(command)
                 .map(e -> ResponseEntity.status(HttpStatus.OK).body(e));
     }
 

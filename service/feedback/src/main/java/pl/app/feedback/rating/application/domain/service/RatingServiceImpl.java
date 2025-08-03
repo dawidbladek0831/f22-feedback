@@ -32,7 +32,7 @@ class RatingServiceImpl implements RatingService {
     private final CreationRatingPolicy creationRatingPolicy;
 
     @Override
-    public Mono<Rating> create(RatingCommand.CrateRatingCommand rawCommand) {
+    public Mono<Rating> upsert(RatingCommand.UpsertRatingCommand rawCommand) {
         var command = normalizeCommand(rawCommand);
         return Mono.fromCallable(() ->
                 allowedDomainObjectTypesRatingPolicy.apply(command.domainObjectType())
@@ -44,16 +44,16 @@ class RatingServiceImpl implements RatingService {
                                 )
                         )
         ).doOnSubscribe(subscription ->
-                logger.debug("crating/updating rating: {}-{}-{} {}", command.domainObjectType(), command.domainObjectId(), command.userId(), command.rating())
+                logger.debug("upsert rating: {}-{}-{} {}", command.domainObjectType(), command.domainObjectId(), command.userId(), command.rating())
         ).flatMap(Function.identity()).doOnSuccess(domain ->
-                logger.debug("crated/updated rating: {}-{}-{} {}", command.domainObjectType(), command.domainObjectId(), command.userId(), command.rating())
+                logger.debug("upserting rating: {}-{}-{} {}", command.domainObjectType(), command.domainObjectId(), command.userId(), command.rating())
         ).doOnError(e ->
-                logger.error("exception occurred while crating/updating rating: {}-{}-{} {}, exception: {}", command.domainObjectType(), command.domainObjectId(), command.userId(), command.rating(), e.toString())
+                logger.error("exception occurred while upsert rating: {}-{}-{} {}, exception: {}", command.domainObjectType(), command.domainObjectId(), command.userId(), command.rating(), e.toString())
         );
     }
 
-    private RatingCommand.CrateRatingCommand normalizeCommand(RatingCommand.CrateRatingCommand command) {
-        return new RatingCommand.CrateRatingCommand(
+    private RatingCommand.UpsertRatingCommand normalizeCommand(RatingCommand.UpsertRatingCommand command) {
+        return new RatingCommand.UpsertRatingCommand(
                 command.domainObjectType().toUpperCase(),
                 command.domainObjectId(),
                 command.userId(),

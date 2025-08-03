@@ -2,7 +2,7 @@ package pl.app.feedback.rating.application.port.in;
 
 public interface RatingCommand {
 
-    record CrateRatingCommand(
+    record UpsertRatingCommand(
             String domainObjectType,
             String domainObjectId,
             String userId,

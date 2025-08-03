@@ -4,7 +4,7 @@ import pl.app.feedback.rating.application.domain.model.Rating;
 import reactor.core.publisher.Mono;
 
 public interface RatingService {
-    Mono<Rating> create(RatingCommand.CrateRatingCommand command);
+    Mono<Rating> upsert(RatingCommand.UpsertRatingCommand command);
 
     Mono<Rating> remove(RatingCommand.RemoveRatingCommand command);
 }
