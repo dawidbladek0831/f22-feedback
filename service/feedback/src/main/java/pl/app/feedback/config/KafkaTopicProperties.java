@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
+import pl.app.feedback.comment.application.domain.model.CommentEvent;
 import pl.app.feedback.comment.report.application.domain.model.ReportEvent;
 import pl.app.feedback.rating.application.domain.model.RatingEvent;
 import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
@@ -34,6 +35,12 @@ public class KafkaTopicProperties {
     private Topic reportApproved;
     private Topic reportRejected;
 
+    private Topic commentCreated;
+    private Topic commentUpdated;
+    private Topic commentRemoved;
+    private Topic commentHidden;
+    private Topic commentRestored;
+
     public List<Topic> getAllTopics() {
         return List.of(
                 reactionCreated,
@@ -46,10 +53,15 @@ public class KafkaTopicProperties {
 
                 reportCreated,
                 reportApproved,
-                reportRejected
+                reportRejected,
+
+                commentCreated,
+                commentUpdated,
+                commentRemoved,
+                commentHidden,
+                commentRestored
         );
     }
-
     public List<String> getAllTopicNames() {
         return getAllTopics().stream()
                 .map(Topic::getTopicNames)
@@ -70,6 +82,12 @@ public class KafkaTopicProperties {
             case ReportEvent.ReportCreatedEvent e -> reportCreated;
             case ReportEvent.ReportApprovedEvent e -> reportApproved;
             case ReportEvent.ReportRejectedEvent e -> reportRejected;
+
+            case CommentEvent.CommentCreatedEvent e -> commentCreated;
+            case CommentEvent.CommentUpdatedEvent e -> commentUpdated;
+            case CommentEvent.CommentRemovedEvent e -> commentRemoved;
+            case CommentEvent.CommentHiddenEvent e -> commentHidden;
+            case CommentEvent.CommentRestoredEvent e -> commentRestored;
 
             default -> {
                 logger.error("event {} is not configured in properties", event.getClass().getSimpleName());
