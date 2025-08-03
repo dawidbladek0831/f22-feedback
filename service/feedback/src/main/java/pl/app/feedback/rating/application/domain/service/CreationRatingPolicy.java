@@ -8,10 +8,6 @@ import org.springframework.stereotype.Component;
 import pl.app.common.event.EventPublisher;
 import pl.app.feedback.rating.application.domain.model.Rating;
 import pl.app.feedback.rating.application.domain.model.RatingEvent;
-import pl.app.feedback.reaction.application.domain.model.Reaction;
-import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
-import pl.app.feedback.reaction.application.domain.model.ReactionException;
-import pl.app.feedback.reaction.application.port.out.ReactionDomainRepository;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Function;

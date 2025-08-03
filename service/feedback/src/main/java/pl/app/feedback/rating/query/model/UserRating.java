@@ -1,6 +1,5 @@
 package pl.app.feedback.rating.query.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,12 +18,10 @@ import java.util.Optional;
 @NoArgsConstructor
 public class UserRating {
     @Id
-    @JsonIgnore
     private ObjectId id;
     private String userId;
     private List<Rating> ratings;
     @Version
-    @JsonIgnore
     private Long version;
 
     public UserRating(String userId) {

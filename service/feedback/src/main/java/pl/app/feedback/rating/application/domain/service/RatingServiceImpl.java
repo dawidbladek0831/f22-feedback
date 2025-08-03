@@ -67,8 +67,8 @@ class RatingServiceImpl implements RatingService {
         return Mono.fromCallable(() ->
                 repository.fetchByDomainObjectAndUser(command.domainObjectType(), command.domainObjectId(), command.userId())
                         .flatMap(domain -> mongoTemplate.remove(domain)
-                                    .then(eventPublisher.publish(new RatingEvent.RatingRemovedEvent(domain.getId(), domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getUserId(), domain.getRating())))
-                                    .thenReturn(domain)
+                                .then(eventPublisher.publish(new RatingEvent.RatingRemovedEvent(domain.getId(), domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getUserId(), domain.getRating())))
+                                .thenReturn(domain)
                         )
         ).doOnSubscribe(subscription ->
                 logger.debug("removing rating: {}-{}-{}", command.domainObjectType(), command.domainObjectId(), command.userId())
@@ -78,6 +78,7 @@ class RatingServiceImpl implements RatingService {
                 logger.error("exception occurred while removing rating: {}-{}-{}, exception: {}", command.domainObjectType(), command.domainObjectId(), command.userId(), e.toString())
         );
     }
+
     private RatingCommand.RemoveRatingCommand normalizeCommand(RatingCommand.RemoveRatingCommand command) {
         return new RatingCommand.RemoveRatingCommand(
                 command.domainObjectType().toUpperCase(),

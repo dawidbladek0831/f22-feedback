@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.app.feedback.rating.query.model.UserRating;
+import pl.app.feedback.rating.query.dto.RatingDto;
 import pl.app.feedback.rating.query.port.DomainObjectRatingQueryService;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -20,10 +21,9 @@ class UserRatingQueryRestController {
     private final DomainObjectRatingQueryService queryService;
 
     @GetMapping
-    Mono<ResponseEntity<UserRating>> fetchBy(
+    Mono<ResponseEntity<Flux<RatingDto>>> fetchBy(
             @PathVariable String userId
     ) {
-        return queryService.fetchBy(userId)
-                .map(ResponseEntity::ok);
+        return Mono.just(ResponseEntity.ok(queryService.fetchBy(userId)));
     }
 }

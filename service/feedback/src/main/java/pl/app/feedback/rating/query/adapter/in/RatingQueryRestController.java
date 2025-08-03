@@ -2,8 +2,11 @@ package pl.app.feedback.rating.query.adapter.in;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import pl.app.feedback.rating.application.domain.model.Rating;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import pl.app.feedback.rating.query.dto.RatingDto;
 import pl.app.feedback.rating.query.port.DomainObjectRatingQueryService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,7 +20,7 @@ class RatingQueryRestController {
     private final DomainObjectRatingQueryService queryService;
 
     @GetMapping
-    Mono<ResponseEntity<Flux<Rating>>> fetchAllBy(
+    Mono<ResponseEntity<Flux<RatingDto>>> fetchAllBy(
             @RequestParam(required = false) String userId,
             @RequestParam(required = false) String domainObjectType,
             @RequestParam(required = false) String domainObjectId

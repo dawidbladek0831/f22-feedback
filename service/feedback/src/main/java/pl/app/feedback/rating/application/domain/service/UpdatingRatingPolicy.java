@@ -28,11 +28,11 @@ class UpdatingRatingPolicy {
                             .thenReturn(domain);
                 }
         ).doOnSubscribe(subscription ->
-                logger.debug("updating rating: {}-{}-{}", domain.getDomainObjectType(),domain.getDomainObjectId(), domain.getRating())
+                logger.debug("updating rating: {}-{}-{}", domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getRating())
         ).flatMap(Function.identity()).doOnSuccess(d ->
-                logger.debug("updated rating: {}-{}-{}", domain.getDomainObjectType(),domain.getDomainObjectId(), domain.getRating())
+                logger.debug("updated rating: {}-{}-{}", domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getRating())
         ).doOnError(e ->
-                logger.error("exception occurred while updating rating: {}-{}-{}, exception: {}", domain.getDomainObjectType(),domain.getDomainObjectId(), domain.getRating(), e.toString())
+                logger.error("exception occurred while updating rating: {}-{}-{}, exception: {}", domain.getDomainObjectType(), domain.getDomainObjectId(), domain.getRating(), e.toString())
         );
     }
 }

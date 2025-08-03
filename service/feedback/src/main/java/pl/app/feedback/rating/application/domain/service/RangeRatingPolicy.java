@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import pl.app.feedback.rating.application.domain.model.RatingException;
-import pl.app.feedback.reaction.application.domain.model.ReactionException;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
