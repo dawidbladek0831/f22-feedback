@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
 
@@ -16,12 +17,11 @@ import java.util.*;
 @NoArgsConstructor
 public class UserReaction {
     @Id
-    @JsonIgnore
     private ObjectId id;
+    @Indexed
     private String userId;
     private List<Reaction> reactions;
     @Version
-    @JsonIgnore
     private Long version;
 
     public UserReaction(String userId) {

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
 
@@ -15,6 +16,7 @@ import java.util.Map;
 @Document(collection = "domain-object-reaction")
 @Data
 @NoArgsConstructor
+@CompoundIndex(name = "domain-object_idx", def = "{'domainObjectType': 1, 'domainObjectId': 1}")
 public class DomainObjectReaction {
     @Id
     @JsonIgnore
