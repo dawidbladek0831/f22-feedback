@@ -6,15 +6,16 @@ import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 import pl.app.feedback.rating.application.domain.model.RatingEvent;
 
 @Document(collection = "domain-object-rating")
 @Data
 @NoArgsConstructor
+@CompoundIndex(name = "domain-object_idx", def = "{'domainObjectType': 1, 'domainObjectId': 1}")
 public class DomainObjectRating {
     @Id
-    @JsonIgnore
     private ObjectId id;
     private String domainObjectType;
     private String domainObjectId;

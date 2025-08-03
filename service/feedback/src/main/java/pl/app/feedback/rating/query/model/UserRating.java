@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import pl.app.feedback.rating.application.domain.model.RatingEvent;
 
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class UserRating {
     @Id
     private ObjectId id;
+    @Indexed(name = "user_idx")
     private String userId;
     private List<Rating> ratings;
     @Version

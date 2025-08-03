@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "rating")
 @Getter
 @NoArgsConstructor
+@CompoundIndex(name = "domain-object_user_idx", def = "{'domainObjectType': 1, 'domainObjectId': 1, 'userId': 1}")
 public class Rating {
     @Id
     private ObjectId id;
