@@ -1,4 +1,4 @@
-package pl.app.feedback.reaction.query.adapter.out;
+package pl.app.feedback.reaction.query.service;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;

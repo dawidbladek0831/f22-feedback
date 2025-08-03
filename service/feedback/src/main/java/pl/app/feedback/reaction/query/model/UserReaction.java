@@ -1,6 +1,5 @@
 package pl.app.feedback.reaction.query.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;

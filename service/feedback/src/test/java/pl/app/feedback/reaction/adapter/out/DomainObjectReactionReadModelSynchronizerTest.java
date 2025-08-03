@@ -44,7 +44,7 @@ class DomainObjectReactionReadModelSynchronizerTest {
                 .expectNextCount(1)
                 .verifyComplete();
         StepVerifier.create(
-                        queryService.fetchBy(domainObjectType, domainObjectId)
+                        queryService.fetchDomainObjectReaction(domainObjectType, domainObjectId)
                 ).assertNext(readModel -> {
                     assertThat(readModel.getReactions()).hasSize(2);
                     assertThat(readModel.getReactions().get("LIKE")).isEqualTo(1);

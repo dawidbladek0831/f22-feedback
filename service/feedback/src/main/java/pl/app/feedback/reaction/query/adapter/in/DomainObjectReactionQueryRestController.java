@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.app.feedback.reaction.query.model.DomainObjectReaction;
+import pl.app.feedback.reaction.query.dto.DomainObjectReactionDto;
 import pl.app.feedback.reaction.query.port.DomainObjectReactionQueryService;
 import reactor.core.publisher.Mono;
 
@@ -20,11 +20,11 @@ class DomainObjectReactionQueryRestController {
     private final DomainObjectReactionQueryService queryService;
 
     @GetMapping
-    Mono<ResponseEntity<DomainObjectReaction>> fetchBy(
+    Mono<ResponseEntity<DomainObjectReactionDto>> fetchBy(
             @PathVariable String domainObjectType,
             @PathVariable String domainObjectId
     ) {
-        return queryService.fetchBy(domainObjectType, domainObjectId)
+        return queryService.fetchDomainObjectReaction(domainObjectType, domainObjectId)
                 .map(ResponseEntity::ok);
     }
 }
