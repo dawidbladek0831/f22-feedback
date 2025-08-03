@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
+import pl.app.feedback.comment.report.application.domain.model.ReportEvent;
 import pl.app.feedback.rating.application.domain.model.RatingEvent;
 import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
 
@@ -29,6 +30,10 @@ public class KafkaTopicProperties {
     private Topic ratingUpdated;
     private Topic ratingRemoved;
 
+    private Topic reportCreated;
+    private Topic reportApproved;
+    private Topic reportRejected;
+
     public List<Topic> getAllTopics() {
         return List.of(
                 reactionCreated,
@@ -37,7 +42,11 @@ public class KafkaTopicProperties {
 
                 ratingCreated,
                 ratingUpdated,
-                ratingRemoved
+                ratingRemoved,
+
+                reportCreated,
+                reportApproved,
+                reportRejected
         );
     }
 
@@ -57,6 +66,10 @@ public class KafkaTopicProperties {
             case RatingEvent.RatingCreatedEvent e -> ratingCreated;
             case RatingEvent.RatingUpdatedEvent e -> ratingUpdated;
             case RatingEvent.RatingRemovedEvent e -> ratingRemoved;
+
+            case ReportEvent.ReportCreatedEvent e -> reportCreated;
+            case ReportEvent.ReportApprovedEvent e -> reportApproved;
+            case ReportEvent.ReportRejectedEvent e -> reportRejected;
 
             default -> {
                 logger.error("event {} is not configured in properties", event.getClass().getSimpleName());
