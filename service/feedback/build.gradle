@@ -35,13 +35,17 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
+	// SECURITY
+	implementation "org.springframework.boot:spring-boot-starter-security"
+	implementation 'org.springframework.security:spring-security-oauth2-resource-server'
+	implementation 'org.springframework.security:spring-security-oauth2-jose'
+
 	// DATABASE
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
 
 	// BROKER
 	implementation 'org.apache.kafka:kafka-streams'
 	implementation 'org.springframework.kafka:spring-kafka'
-//	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka' // change to testImplementation
 
 	// LOMBOK
 	compileOnly "org.projectlombok:lombok"

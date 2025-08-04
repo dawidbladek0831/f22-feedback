@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 
 @Configuration
 @EnableReactiveMongoRepositories(basePackages = "pl.app.feedback")
-public class MongoConfig extends AbstractReactiveMongoConfiguration {
+class MongoConfig extends AbstractReactiveMongoConfiguration {
     @Value("${spring.data.mongodb.database}")
     private String database;
 

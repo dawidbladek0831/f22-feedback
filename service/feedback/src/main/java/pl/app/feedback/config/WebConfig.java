@@ -13,7 +13,7 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 @Configuration
 @RequiredArgsConstructor
-public class WebConfig implements WebFluxConfigurer {
+class WebConfig implements WebFluxConfigurer {
 
     @Bean
     public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {

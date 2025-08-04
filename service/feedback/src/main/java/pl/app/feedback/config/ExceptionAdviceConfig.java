@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ServerWebExchange;
 import pl.app.common.exception.*;
 
-//TODO
 @Configuration
-public class ExceptionAdviceConfig {
+class ExceptionAdviceConfig {
     @Bean
     ExceptionAdvice ExceptionAdvice() {
         return new ExceptionAdvice();

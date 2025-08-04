@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableKafka
 @PropertySource("classpath:kafka.properties")
-public class KafkaConfig {
+class KafkaConfig {
     private static final Logger logger = LoggerFactory.getLogger(KafkaConfig.class);
     private final KafkaTopicProperties topicNames;
     @Value("${app.kafka.bootstrap.servers}")

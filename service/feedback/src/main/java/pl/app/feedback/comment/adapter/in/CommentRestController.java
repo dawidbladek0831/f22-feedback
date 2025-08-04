@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import pl.app.feedback.comment.application.domain.model.Comment;
 import pl.app.feedback.comment.application.port.in.CommentCommand;
 import pl.app.feedback.comment.application.port.in.CommentService;
+import pl.app.feedback.comment.query.port.CommentQueryService;
+import pl.app.feedback.config.AuthorizationService;
+import pl.app.feedback.config.SecurityScopes;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -17,12 +20,14 @@ class CommentRestController {
     public static final String resourceName = "comments";
     public static final String resourcePath = "/api/v1/" + resourceName;
     private final CommentService service;
+    private final CommentQueryService queryService;
 
     @PostMapping
     Mono<ResponseEntity<Comment>> create(
             @RequestBody CommentCommand.CreateCommentCommand command
     ) {
-        return service.create(command)
+        return AuthorizationService.verifySubjectIsOwnerOrHasAuthority(command.userId(), SecurityScopes.COMMENT_MANAGE.getScopeName())
+                .then(service.create(command))
                 .map(e -> ResponseEntity.status(HttpStatus.OK).body(e));
     }
 
@@ -31,7 +36,9 @@ class CommentRestController {
             @PathVariable ObjectId commentId,
             @RequestBody CommentCommand.UpdateCommentCommand command
     ) {
-        return service.update(command)
+        return queryService.fetchBy(command.commentId())
+                .flatMap(comment -> AuthorizationService.verifySubjectIsOwnerOrHasAuthority(comment.getUserId(), SecurityScopes.COMMENT_MANAGE.getScopeName()))
+                .then(service.update(command))
                 .map(e -> ResponseEntity.status(HttpStatus.OK).body(e));
     }
 
@@ -39,7 +46,9 @@ class CommentRestController {
     Mono<ResponseEntity<Comment>> remove(
             @PathVariable ObjectId commentId
     ) {
-        return service.remove(new CommentCommand.RemoveCommentCommand(commentId))
+        return queryService.fetchBy(commentId)
+                .flatMap(comment -> AuthorizationService.verifySubjectIsOwnerOrHasAuthority(comment.getUserId(), SecurityScopes.COMMENT_MANAGE.getScopeName()))
+                .then(service.remove(new CommentCommand.RemoveCommentCommand(commentId)))
                 .map(e -> ResponseEntity.status(HttpStatus.OK).body(e));
     }
 

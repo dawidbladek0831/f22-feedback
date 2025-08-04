@@ -8,13 +8,11 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import org.bson.types.ObjectId;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -29,7 +27,7 @@ import java.util.Objects;
  * */
 //TODO
 @Configuration
-public class JacksonConfig {
+class JacksonConfig {
     public static class ObjectIdSerializer extends StdSerializer<ObjectId> {
 
         public ObjectIdSerializer() {

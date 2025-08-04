@@ -20,7 +20,7 @@ import java.util.List;
 @Data
 @ConfigurationProperties(prefix = "app.kafka.topic")
 @PropertySource("classpath:kafka.properties")
-public class KafkaTopicProperties {
+class KafkaTopicProperties {
     private static final Logger logger = LoggerFactory.getLogger(KafkaTopicProperties.class);
 
     private Topic reactionCreated;
@@ -62,6 +62,7 @@ public class KafkaTopicProperties {
                 commentRestored
         );
     }
+
     public List<String> getAllTopicNames() {
         return getAllTopics().stream()
                 .map(Topic::getTopicNames)
