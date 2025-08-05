@@ -1,0 +1,9 @@
+rootProject.name = 'app'
+
+// COMMON
+include "common:exception"
+include "common:event"
+include "common:mapper"
+
+// SERVICES
+include "service:feedback"
