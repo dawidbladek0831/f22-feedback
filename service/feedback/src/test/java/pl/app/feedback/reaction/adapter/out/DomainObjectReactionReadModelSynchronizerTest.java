@@ -47,8 +47,8 @@ class DomainObjectReactionReadModelSynchronizerTest {
                         queryService.fetchDomainObjectReaction(domainObjectType, domainObjectId)
                 ).assertNext(readModel -> {
                     assertThat(readModel.getReactions()).hasSize(2);
-                    assertThat(readModel.getReactions().get("LIKE")).isEqualTo(1);
-                    assertThat(readModel.getReactions().get("DISLIKE")).isEqualTo(1);
+                    assertThat(readModel.getReactions().stream().filter(e -> e.getName().equals("LIKE")).findAny().get().getQuantity()).isEqualTo(1);
+                    assertThat(readModel.getReactions().stream().filter(e -> e.getName().equals("DISLIKE")).findAny().get().getQuantity()).isEqualTo(1);
                 })
                 .verifyComplete();
     }

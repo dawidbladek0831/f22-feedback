@@ -39,13 +39,12 @@ class UserRatingReadModelSynchronizerTest {
 
         StepVerifier.create(
                         queryService.fetchUserRating(userId)
-                ).assertNext(userRating -> {
-                    assertThat(userRating.getRatings()).hasSize(1);
-                    assertThat(userRating.getRatings().get(0).getId()).isEqualTo(domainId);
-                    assertThat(userRating.getRatings().get(0).getDomainObjectType()).isEqualTo(domainObjectType);
-                    assertThat(userRating.getRatings().get(0).getDomainObjectId()).isEqualTo(domainObjectId);
-                    assertThat(userRating.getRatings().get(0).getUserId()).isEqualTo(userId);
-                    assertThat(userRating.getRatings().get(0).getRating()).isEqualTo(firstRating);
+                ).assertNext(rating -> {
+                    assertThat(rating.getId()).isEqualTo(domainId);
+                    assertThat(rating.getDomainObjectType()).isEqualTo(domainObjectType);
+                    assertThat(rating.getDomainObjectId()).isEqualTo(domainObjectId);
+                    assertThat(rating.getUserId()).isEqualTo(userId);
+                    assertThat(rating.getRating()).isEqualTo(firstRating);
                 })
                 .verifyComplete();
     }
@@ -71,13 +70,12 @@ class UserRatingReadModelSynchronizerTest {
 
         StepVerifier.create(
                         queryService.fetchUserRating(userId)
-                ).assertNext(userRating -> {
-                    assertThat(userRating.getRatings()).hasSize(1);
-                    assertThat(userRating.getRatings().get(0).getId()).isEqualTo(domainId);
-                    assertThat(userRating.getRatings().get(0).getDomainObjectType()).isEqualTo(domainObjectType);
-                    assertThat(userRating.getRatings().get(0).getDomainObjectId()).isEqualTo(domainObjectId);
-                    assertThat(userRating.getRatings().get(0).getUserId()).isEqualTo(userId);
-                    assertThat(userRating.getRatings().get(0).getRating()).isEqualTo(secondRating);
+                ).assertNext(rating -> {
+                    assertThat(rating.getId()).isEqualTo(domainId);
+                    assertThat(rating.getDomainObjectType()).isEqualTo(domainObjectType);
+                    assertThat(rating.getDomainObjectId()).isEqualTo(domainObjectId);
+                    assertThat(rating.getUserId()).isEqualTo(userId);
+                    assertThat(rating.getRating()).isEqualTo(secondRating);
                 })
                 .verifyComplete();
     }
@@ -107,9 +105,7 @@ class UserRatingReadModelSynchronizerTest {
 
         StepVerifier.create(
                         queryService.fetchUserRating(userId)
-                ).assertNext(userRating -> {
-                    assertThat(userRating.getRatings()).hasSize(0);
-                })
+                )
                 .verifyComplete();
     }
 

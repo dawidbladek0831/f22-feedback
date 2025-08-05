@@ -6,12 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import pl.app.common.event.EventPublisher;
 import pl.app.feedback.reaction.application.domain.model.ReactionEvent;
 import reactor.test.StepVerifier;
@@ -23,12 +21,8 @@ import static org.mockito.Mockito.verify;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebTestClient
 @ExtendWith(MockitoExtension.class)
 class ReactionServiceTest {
-
-    @Autowired
-    private WebTestClient webTestClient;
 
     @Autowired
     private ReactionService reactionService;
@@ -65,6 +59,7 @@ class ReactionServiceTest {
         verify(eventPublisher, times(1)).publish(any(ReactionEvent.ReactionCreatedEvent.class));
         verify(eventPublisher, times(1)).publish(any(ReactionEvent.ReactionAddedEvent.class));
     }
+
     @Test
     void whenUserSendSecondReaction_thenReactionShouldBeOnlyUpdated() {
         var domainObjectType = "poST";
@@ -123,7 +118,7 @@ class ReactionServiceTest {
     }
 
     @Test
-    void whenSingleUserReactionPolicyIsEnable_thenBeforeAddingReactionPolicyShouldRemoveExistingReactions(){
+    void whenSingleUserReactionPolicyIsEnable_thenBeforeAddingReactionPolicyShouldRemoveExistingReactions() {
         var domainObjectType = "POST";
         var domainObjectId = ObjectId.get().toString();
         var userId = ObjectId.get().toString();
